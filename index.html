@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学习资料收集</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    padding: 48px 24px 32px;
+    text-align: center;
+  }
+  .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+  .header p  { font-size: 0.9rem; opacity: 0.85; }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 28px 16px 60px; }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+  }
+  .section-title { font-size: 1.05rem; font-weight: 600; color: #555; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 0.9rem; font-weight: 500; transition: all 0.2s;
+  }
+  .btn-primary {
+    background: #4f46e5; color: #fff;
+  }
+  .btn-primary:hover { background: #4338ca; }
+  .btn-sm {
+    padding: 4px 12px; font-size: 0.78rem; border-radius: 6px;
+    background: #fee2e2; color: #dc2626;
+  }
+  .btn-sm:hover { background: #fecaca; }
+
+  .card-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .card {
+    background: #fff; border-radius: 10px; padding: 18px 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: flex; align-items: center; gap: 14px;
+    text-decoration: none; color: inherit;
+  }
+  .card:hover {
+    box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+    transform: translateY(-2px);
+  }
+
+  .card-icon {
+    width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .icon-html { background: #fef3c7; }
+  .icon-pdf  { background: #fce7f3; }
+  .icon-doc  { background: #dbeafe; }
+  .icon-code { background: #d1fae5; }
+  .icon-text { background: #ede9fe; }
+  .icon-other { background: #f3f4f6; }
+
+  .card-info { flex: 1; min-width: 0; }
+  .card-title {
+    font-size: 0.98rem; font-weight: 600; margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card-meta { font-size: 0.78rem; color: #999; display: flex; gap: 12px; }
+  .card-arrow { color: #ccc; font-size: 1rem; flex-shrink: 0; }
+
+  /* modal */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .overlay.hidden { display: none; }
+
+  .modal {
+    background: #fff; border-radius: 14px; padding: 28px 30px;
+    width: 90%; max-width: 460px; box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  }
+  .modal h3 { font-size: 1.15rem; margin-bottom: 20px; }
+  .modal label { display: block; font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 4px; margin-top: 14px; }
+  .modal label:first-of-type { margin-top: 0; }
+  .modal input, .modal select {
+    width: 100%; padding: 10px 12px; border: 1.5px solid #ddd; border-radius: 8px;
+    font-size: 0.92rem; outline: none; transition: border-color 0.2s;
+  }
+  .modal input:focus, .modal select:focus { border-color: #4f46e5; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+  .btn-cancel { background: #f3f4f6; color: #555; }
+  .btn-cancel:hover { background: #e5e7eb; }
+
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 0.72rem; font-weight: 600;
+    background: #ede9fe; color: #7c3aed;
+  }
+
+  .footer { text-align: center; padding: 16px; font-size: 0.78rem; color: #bbb; }
+
+  @media (max-width: 500px) {
+    .header { padding: 36px 16px 24px; }
+    .header h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>学习资料收集</h1>
+  <p>整理和索引近期的学习材料</p>
+</div>
+
+<div class="container">
+  <div class="section-header">
+    <h2 class="section-title">资料列表</h2>
+    <button class="btn btn-primary" onclick="openModal()">+ 添加资料</button>
+  </div>
+
+  <div class="card-list" id="cardList"></div>
+  <div id="empty" style="text-align:center;padding:60px 20px;color:#aaa;">
+    <div style="font-size:2.8rem;margin-bottom:10px;">📂</div>
+    <p>暂无学习资料，点击上方按钮添加</p>
+  </div>
+</div>
+
+<div class="footer" id="footer"></div>
+
+<!-- Add Modal -->
+<div class="overlay hidden" id="overlay" onclick="maybeClose(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>添加学习资料</h3>
+    <label>文件名（含扩展名）</label>
+    <input type="text" id="inputFile" placeholder="例如：react-notes.html">
+
+    <label>分类</label>
+    <select id="inputType">
+      <option value="html">HTML / 网页</option>
+      <option value="pdf">PDF 文档</option>
+      <option value="doc">Word 文档</option>
+      <option value="code">代码</option>
+      <option value="text">文本 / 笔记</option>
+      <option value="other">其他</option>
+    </select>
+
+    <label>标签（可选）</label>
+    <input type="text" id="inputTag" placeholder="例如：前端、AI、算法">
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="addItem()">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'myweb_study_items';
+const BUILTIN = [
+  { file: '贪吃蛇游戏核心设计方案.html', type: 'html', tag: '游戏', added: '2026-05-27' }
+];
+
+const TYPE_ICON = {
+  html: '🌐', pdf: '📄', doc: '📝', code: '💻', text: '📋', other: '📎'
+};
+const TYPE_CLS = {
+  html: 'icon-html', pdf: 'icon-pdf', doc: 'icon-doc', code: 'icon-code', text: 'icon-text', other: 'icon-other'
+};
+
+function loadItems() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveItems(items) { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+
+function render() {
+  const userItems = loadItems();
+  const all = [...BUILTIN];
+  userItems.forEach(u => {
+    if (!all.find(b => b.file === u.file)) all.push(u);
+  });
+
+  const listEl = document.getElementById('cardList');
+  const emptyEl = document.getElementById('empty');
+
+  if (!all.length) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = '';
+  } else {
+    emptyEl.style.display = 'none';
+    listEl.innerHTML = all.map((item, i) => `
+      <a class="card" href="${item.file}" target="_blank">
+        <div class="card-icon ${TYPE_CLS[item.type] || 'icon-other'}">${TYPE_ICON[item.type] || '📎'}</div>
+        <div class="card-info">
+          <div class="card-title">${item.file}</div>
+          <div class="card-meta">
+            <span>${item.added || ''}</span>
+            ${item.tag ? `<span class="tag">${item.tag}</span>` : ''}
+          </div>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+    `).join('');
+  }
+
+  document.getElementById('footer').textContent =
+    `共 ${all.length} 项 · ${new Date().toLocaleString('zh-CN')}`;
+}
+
+function openModal() {
+  document.getElementById('overlay').classList.remove('hidden');
+  document.getElementById('inputFile').focus();
+}
+function closeModal() {
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('inputFile').value = '';
+  document.getElementById('inputTag').value = '';
+  document.getElementById('inputType').value = 'html';
+}
+function maybeClose(e) { if (e.target === e.currentTarget) closeModal(); }
+
+function addItem() {
+  const file = document.getElementById('inputFile').value.trim();
+  const type = document.getElementById('inputType').value;
+  const tag  = document.getElementById('inputTag').value.trim();
+  if (!file) return alert('请输入文件名');
+
+  const items = loadItems();
+  const today = new Date().toISOString().slice(0, 10);
+  items.push({ file, type, tag, added: today });
+  saveItems(items);
+  closeModal();
+  render();
+}
+
+// Delete item (for future use)
+function removeItem(file) {
+  const items = loadItems().filter(i => i.file !== file);
+  saveItems(items);
+  render();
+}
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && !document.getElementById('overlay').classList.contains('hidden')) {
+    addItem();
+  }
+});
+
+render();
+</script>
+
+</body>
+</html>

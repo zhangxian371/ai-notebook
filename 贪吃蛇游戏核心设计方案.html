@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇游戏设计方案 (无代码版)</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --snake-head: #27ae60;
+            --snake-body: #2ecc71;
+            --food: #e74c3c;
+            --bg-color: #fcfcfc;
+        }
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: var(--bg-color);
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: var(--primary-color);
+            margin-top: 40px;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
+        }
+        h3 { color: #555; }
+        p { font-size: 16px; margin-bottom: 15px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        
+        /* 模拟图表容器 */
+        .diagram-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .diagram-caption {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* 游戏网格示意图 */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 25px);
+            grid-template-rows: repeat(10, 25px);
+            gap: 1px;
+            background-color: #bdc3c7;
+            border: 5px solid var(--primary-color);
+            padding: 1px;
+        }
+        .cell { background-color: #ecf0f1; width: 25px; height: 25px; }
+        .head { background-color: var(--snake-head); border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
+        .body { background-color: var(--snake-body); border-radius: 4px; }
+        .food-cell { background-color: var(--food); border-radius: 50%; box-shadow: 0 0 8px rgba(231, 76, 60, 0.6); }
+
+        /* 流程图样式 */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+        }
+        .flow-node {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            min-width: 120px;
+        }
+        .flow-arrow {
+            font-size: 24px;
+            color: #95a5a6;
+            font-weight: bold;
+        }
+        
+        /* 状态机样式 */
+        .state-machine {
+            display: grid;
+            grid-template-columns: 1fr 50px 1fr 50px 1fr;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+        .state-node {
+            border: 2px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 50%;
+            background: #fff;
+            font-weight: bold;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        /* 属性表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th { background-color: var(--primary-color); color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <h1>🐍 贪吃蛇游戏核心设计方案</h1>
+    <p>本方案旨在提供一个清晰、无代码干扰的架构蓝图，帮助设计者和开发者理解贪吃蛇游戏的核心逻辑、视觉布局和交互规则。</p>
+
+    <h2>1. 游戏核心实体定义</h2>
+    <p>游戏主要由三个核心实体构成，它们在二维网格系统中相互作用：</p>
+    <table>
+        <tr>
+            <th>实体名称</th>
+            <th>属性特征</th>
+            <th>核心行为 / 规则</th>
+        </tr>
+        <tr>
+            <td><strong>🗺️ 游戏地图 (Map)</strong></td>
+            <td>宽度 (Columns), 高度 (Rows)</td>
+            <td>限制活动范围，提供坐标系基准。</td>
+        </tr>
+        <tr>
+            <td><strong>🐍 贪吃蛇 (Snake)</strong></td>
+            <td>长度 (Length), 移动方向 (Direction), 身体坐标集合 (List of X,Y)</td>
+            <td>持续向当前方向移动；不可反向移动；吃到食物变长；撞墙或撞自己则死亡。</td>
+        </tr>
+        <tr>
+            <td><strong>🍎 食物 (Food)</strong></td>
+            <td>位置坐标 (X, Y), 积分价值 (Value)</td>
+            <td>随机生成在地图的空白处（不能生成在蛇身上）；被吃掉后立即在别处重新生成。</td>
+        </tr>
+    </table>
+
+    <h2>2. 视觉布局设计图</h2>
+    <p>游戏采用经典的“格子化”设计。以下是运行中的游戏画面结构分解：</p>
+    
+    <div class="diagram-box">
+        <div class="game-grid">
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell food-cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell body"></div><div class="cell body"></div><div class="cell body"></div><div class="cell head"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell body"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell body"></div><div class="cell body"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="diagram-caption">图解：深绿色为蛇头，浅绿色为蛇身，红色圆点为食物。地图外框视为物理边界。</div>
+    </div>
+
+    <h2>3. 核心机制：游戏主循环 (Game Loop)</h2>
+    <p>游戏一旦开始，将以固定的频率（如每秒5次）重复以下“时钟周期”，这也是推动游戏运行的心脏：</p>
+
+    <div class="diagram-box">
+        <div class="flow-container">
+            <div class="flow-node">1. 接收输入<br>(玩家按键)</div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-node" style="background-color: #e67e22;">2. 逻辑更新<br>(移动/判定碰撞)</div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-node" style="background-color: #9b59b6;">3. 画面渲染<br>(重绘网格)</div>
+            <div class="flow-arrow">↻</div>
+        </div>
+        <div class="diagram-caption">图解：游戏主循环流程（循环往复，直到游戏结束）</div>
+    </div>
+
+    <h3>🔍 步骤 2（逻辑更新）的详细拆解：</h3>
+    <ul>
+        <li><strong>确定下一步坐标：</strong> 根据当前蛇头位置和当前方向，计算出下一个网格的坐标。</li>
+        <li><strong>碰撞检测：</strong>
+            <ul>
+                <li>新坐标是否超出了地图边界？如果超出 ➔ <strong>游戏结束</strong>。</li>
+                <li>新坐标是否与现有蛇身的任何一段重合？如果重合 ➔ <strong>游戏结束</strong>。</li>
+            </ul>
+        </li>
+        <li><strong>进食判定与移动：</strong>
+            <ul>
+                <li>如果新坐标是食物所在位置 ➔ 蛇头进入新坐标（变长），分数增加，随机生成新食物，**不删除蛇尾**。</li>
+                <li>如果新坐标是空白区域 ➔ 蛇头进入新坐标，同时**删除蛇尾的最后一节**（实现整体前移的视觉效果）。</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>4. 游戏状态机转换图</h2>
+    <p>游戏作为一个完整的系统，需要在不同的界面状态之间切换：</p>
+
+    <div class="diagram-box">
+        <div class="state-machine">
+            <div class="state-node">待机界面<br>(Start)</div>
+            <div class="flow-arrow">➔</div>
+            <div class="state-node" style="border-color: #27ae60; color: #27ae60;">游戏中<br>(Playing)</div>
+            <div class="flow-arrow">➔</div>
+            <div class="state-node" style="border-color: #e74c3c; color: #e74c3c;">结算界面<br>(Game Over)</div>
+        </div>
+        <div style="margin-top: 20px; text-align: center; font-size: 14px; color: #666;">
+            [玩家点击开始] ➔ 进入游戏中 <br>
+            [触发碰撞规则] ➔ 进入结算界面 <br>
+            [结算界面点击重玩] ➔ 重新初始化地图并返回【游戏中】
+        </div>
+    </div>
+
+    <h2>5. 异常情况与防呆设计 (Edge Cases)</h2>
+    <p>一个优秀的系统设计必须考虑玩家可能产生的异常输入：</p>
+    <ul>
+        <li><strong>防回头机制：</strong> 如果蛇当前向右移动，玩家按下“左”键时，系统必须忽略此输入。蛇只能进行 90 度的转向，不能进行 180 度的立刻掉头（否则会立刻咬到自己的脖子导致游戏结束，体验极差）。</li>
+        <li><strong>快速连按保护：</strong> 在一个“时钟周期”内，如果玩家极快地按了“上”再按“左”（假设原方向是右），系统应该只记录最后一次合法有效按键，或者将指令排入队列中，防止出现蛇头逻辑上没有相撞，但在一帧内完成了两次折返的问题。</li>
+        <li><strong>食物生成的安全域：</strong> 随机生成食物时，必须剔除当前蛇身所占据的所有坐标。如果在游戏大后期，蛇身占据了地图 99% 的空间，食物生成算法必须精准定位到剩下的 1% 空白处，避免死循环。</li>
+    </ul>
+
+</body>
+</html>
