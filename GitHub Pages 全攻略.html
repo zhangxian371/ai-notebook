@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub 网页托管（GitHub Pages）全攻略</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-all: 1.6;
+            color: #24292e;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #0366d6;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 0.3em;
+        }
+        code {
+            background-color: rgba(27,31,35,0.05);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .tip {
+            background-color: #f6f8fa;
+            border-left: 0.25em solid #005cc5;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        ol li {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>GitHub 网页托管（GitHub Pages）是怎么回事？</h1>
+    
+    <p>简单来说，<strong>GitHub Pages</strong> 是 GitHub 提供的一项<strong>免费静态网页托管服务</strong>。</p>
+    <p>平时你写好了前端网页（HTML、CSS、JavaScript），只能在自己的电脑上双击打开。如果你想让全世界的人都能通过网址访问你的网页，正常流程需要买服务器、买域名、配置环境……极其折腾。而 GitHub Pages 把这个流程简化到了极致：<strong>你只需要把网页代码上传到 GitHub 仓库，它就会自动帮你生成一个专属的公开网址。</strong></p>
+
+    <h3>它的核心特点：</h3>
+    <ul>
+        <li><strong>完全免费：</strong> 零成本，不需要服务器，也不强制要求买域名（但支持绑定自定义域名）。</li>
+        <li><strong>只支持静态内容：</strong> 它可以完美运行纯前端的 HTML、CSS、JS，或者由 Hexo、Hugo、VuePress 等生成的静态博客。因为没有后端数据库，所以<strong>不能</strong>运行 PHP、Java、Python 后端程序。</li>
+        <li><strong>自动化更新：</strong> 只要你修改了代码并推送到 GitHub，网站内容就会在几分钟内自动同步更新。</li>
+    </ul>
+
+    
+
+    <h2>如何操作？手把手带你上线第一个网页</h2>
+    <p>只需以下 5 个步骤，你的网页就能传遍全网：</p>
+
+    <ol>
+        <li>
+            <strong>第一步：创建一个公开仓库（Repository）</strong>
+            <p>登录你的 GitHub 账号，点击右上角的 <strong>“+”</strong> 号，选择 <strong>New repository</strong>。给仓库起个名字（例如：<code>my-website</code>）。<strong>注意：</strong> 仓库的权限必须选择 <strong>Public（公开）</strong>，否则免费用户无法开启网页托管功能。</p>
+        </li>
+        <li>
+            <strong>第二步：上传你的网页文件</strong>
+            <p>在新建的仓库里，创建一个名为 <code>index.html</code> 的文件（重要：网站的主首页文件名必须是 <code>index.html</code>，全小写）。在里面随便写点 HTML 代码，比如：<br>
+            <code>&lt;h1&gt;我的第一个 GitHub 网站上线啦！&lt;/h1&gt;</code><br>
+            然后保存并提交（Commit）代码。</p>
+        </li>
+        <li>
+            <strong>第三步：找到 GitHub Pages 设置</strong>
+            <p>进入该仓库的主页面，点击顶部一排选项卡最右侧的 <strong>Settings（设置）</strong>。在左侧侧边栏中找到 <strong>Code and automation</strong> 分组，点击地下的 <strong>Pages</strong> 选项。</p>
+        </li>
+        <li>
+            <strong>第四步：配置分支并保存</strong>
+            <p>在 "Build and deployment" 下方的 "Source" 保持默认的 <code>Deploy from a branch</code>。然后在下面的 "Branch"（分支）下拉菜单中，选择你的主分支（通常是 <code>main</code> 或 <code>master</code>），后面的目录保持 <code>/root</code> 不变，最后点击 <strong>Save</strong> 按钮。</p>
+        </li>
+        <li>
+            <strong>第五步：见证奇迹的时刻</strong>
+            <p>点击保存后，GitHub 会在后台自动帮你部署。稍等 1 到 2 分钟，刷新这个 Pages 页面，你会在顶部看到一行绿色的提示语：<br>
+            <em>"Your site is live at https://你的用户名.github.io/仓库名/"</em>。<br>
+            点击这个链接，全世界任何人都能看到你刚才写的网页了！</p>
+        </li>
+    </</ol>
+
+    <div class="tip">
+        <strong>💡 进阶彩蛋（如何去掉网址后面的仓库名）：</strong><br>
+        如果你想让自己的专属网址看起来更专业（形如 <code>https://username.github.io</code>），你可以创建一个特殊的仓库，<strong>仓库名必须严格等于：你的GitHub用户名.github.io</strong>。在这个仓库里开启 Pages 服务后，它就是你的个人顶级主页了！
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Pages 托管指南</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    line-height: 1.9;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #fff;
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  .header h1 { font-size: 1.8rem; margin-bottom: 6px; }
+  .header p  { font-size: 0.85rem; opacity: 0.7; }
+
+  .container { max-width: 760px; margin: 0 auto; padding: 32px 16px 60px; }
+
+  .card {
+    background: #fff; border-radius: 10px; padding: 24px 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 16px;
+  }
+
+  .card h2 {
+    font-size: 1.1rem; color: #4f46e5;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  p + p { margin-top: 10px; }
+
+  code {
+    background: #f1f1f5; padding: 2px 7px; border-radius: 4px;
+    font-size: 0.85rem; word-break: break-all;
+  }
+
+  pre {
+    background: #1e1e2e; color: #cdd6f4; padding: 16px 20px;
+    border-radius: 8px; font-size: 0.85rem; line-height: 1.7;
+    overflow-x: auto; margin: 12px 0;
+  }
+  pre .key { color: #89b4fa; }
+  pre .str { color: #a6e3a1; }
+  pre .val { color: #fab387; }
+  pre .cmt { color: #6c7086; }
+
+  a { color: #4f46e5; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .highlight {
+    background: #eef2ff; border-left: 4px solid #4f46e5;
+    border-radius: 6px; padding: 14px 18px; margin-top: 12px; font-size: 0.9rem;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+  th, td {
+    text-align: left; padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+  }
+  th { background: #f8f8fc; font-weight: 600; color: #555; }
+
+  .footer { text-align: center; padding: 20px; font-size: 0.78rem; color: #aaa; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>GitHub Pages 托管指南</h1>
+  <p>把本地 HTML 变成公网可访问的网页</p>
+</div>
+
+<div class="container">
+
+  <!-- 是什么 -->
+  <div class="card">
+    <h2>GitHub Pages 是什么</h2>
+    <p>
+      GitHub Pages 是 GitHub 提供的<strong>免费静态网页托管服务</strong>。你把 HTML、CSS、JS 文件推送到 GitHub 仓库，它自动将这些文件部署为一个可以通过公网 URL 访问的网站。
+    </p>
+    <p>简单说就是：<strong>你只管提交代码，GitHub 帮你把网页挂到互联网上</strong>，无需买服务器、不用配 Nginx、不用备案域名。</p>
+    <table>
+      <tr><th>特点</th><th>说明</th></tr>
+      <tr><td>免费</td><td>无限流量，仓库大小限制 1GB</td></tr>
+      <tr><td>自动部署</td><td>推送代码后自动更新网站</td></tr>
+      <tr><td>HTTPS</td><td>自带 SSL 证书，浏览器不会报不安全</td></tr>
+      <tr><td>自定义域名</td><td>可以绑定自己的域名（可选）</td></tr>
+      <tr><td>局限</td><td>只能托管静态文件（HTML/CSS/JS），不能跑后端</td></tr>
+    </table>
+  </div>
+
+  <!-- 怎么操作 -->
+  <div class="card">
+    <h2>怎么启用</h2>
+    <p>启用 GitHub Pages 就是告诉 GitHub：<strong>把哪个分支的哪个目录当成网站根目录</strong>。</p>
+
+    <p style="margin-top:14px;font-weight:600;color:#555;">方法一：调用 GitHub API（本次采用的方式）</p>
+    <pre>curl -X POST "https://api.github.com/repos/<span class="key">{owner}</span>/<span class="key">{repo}</span>/pages" \
+  -H "<span class="key">Authorization: token {你的token}</span>" \
+  -H "<span class="key">Accept: application/vnd.github+json</span>" \
+  -d '<span class="str">{"source":{"branch":"master","path":"/"}}</span>'</pre>
+    <p>这里 <code>source.branch=master</code> 指定用 <code>master</code> 分支，<code>source.path=/</code> 表示把仓库根目录作为网站根目录。API 返回的 <code>html_url</code> 就是你的网站地址。</p>
+
+    <p style="margin-top:14px;font-weight:600;color:#555;">方法二：在 GitHub 网页上操作</p>
+    <p>
+      进入仓库 → <strong>Settings</strong> → <strong>Pages</strong> → "Build and deployment" 下选择
+      <strong>Deploy from a branch</strong> → 选 <code>master</code> 分支和 <code>/ (root)</code> 目录 → 点击 <strong>Save</strong>。
+    </p>
+
+    <p style="margin-top:14px;font-weight:600;color:#555;">方法三：使用 gh CLI</p>
+    <pre>gh api /repos/zhangxian371/ai-notebook/pages \
+  -X POST -f "source[branch]=master" -f "source[path]=/"</pre>
+
+    <div class="highlight">
+      本次实际用的是<strong>方法一</strong>（curl + API），因为电脑上没装 <code>gh</code> CLI。<br>
+      认证用的 token 是从 git 凭据管理器自动获取的：<code>printf "protocol=https\nhost=github.com\n" | git credential fill</code>
+    </div>
+  </div>
+
+  <!-- 原理 -->
+  <div class="card">
+    <h2>背后的原理</h2>
+    <p>启用 Pages 后，GitHub 在后端做了这几件事：</p>
+    <p><strong>1. 触发构建</strong> —— 每次你 <code>git push</code> 到 <code>master</code> 分支，GitHub 会运行一个轻量的构建流程（Jekyll 或直接静态部署）。</p>
+    <p><strong>2. 生成静态站点</strong> —— 因为本项目是纯 HTML，构建就是直接把文件原样拷贝到部署目标。</p>
+    <p><strong>3. 分配到子域名</strong> —— 部署完成后，内容被放到 <code>https://{用户名}.github.io/{仓库名}/</code> 目录下，由 GitHub 的 CDN 分发。</p>
+    <p>最终地址格式：</p>
+    <div class="highlight">
+      仓库地址：<code>https://github.com/zhangxian371/ai-notebook</code><br>
+      网页地址：<code><a href="https://zhangxian371.github.io/ai-notebook/" target="_blank">https://zhangxian371.github.io/ai-notebook/</a></code>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  zhangxian371/ai-notebook · 2026-05-27
+</div>
+
+</body>
+</html>
