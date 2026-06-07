@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王阳明 · 格物与诚意的逻辑之旅</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #faf8f5;
+            color: #2c2c2c;
+            line-height: 1.9;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #e8e0d5;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .meta {
+            margin-top: 16px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        section {
+            margin-bottom: 56px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-left: 16px;
+            border-left: 4px solid #c49a6c;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            color: #3a3a3a;
+            margin: 28px 0 14px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f0ebe3;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #c49a6c;
+            margin-bottom: 12px;
+        }
+
+        .quote {
+            background: #f5f0e8;
+            border-left: 4px solid #c49a6c;
+            padding: 20px 24px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #555;
+        }
+
+        .quote-author {
+            text-align: right;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 8px;
+            font-style: normal;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th {
+            background: #c49a6c;
+            color: #fff;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .comparison-table tr:nth-child(even) td {
+            background: #faf8f5;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fdf8f0 0%, #faf5eb 100%);
+            border: 1px solid #e0cdb8;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin: 24px 0;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            position: relative;
+            padding-left: 36px;
+            margin-bottom: 24px;
+        }
+
+        .step-list li::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 26px;
+            height: 26px;
+            background: #c49a6c;
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 26px;
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+
+        .step-list li .step-title {
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            font-size: 1.05em;
+        }
+
+        .step-list li .step-content {
+            color: #555;
+            font-size: 0.97em;
+        }
+
+        .four-sentence {
+            background: #fff;
+            border: 2px solid #c49a6c;
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+        .four-sentence .line {
+            font-size: 1.15em;
+            color: #333;
+            padding: 6px 0;
+            font-weight: 500;
+        }
+
+        .four-sentence .arrow {
+            color: #c49a6c;
+            font-size: 1.2em;
+        }
+
+        .flow-chart {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px;
+            margin: 24px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f0ebe3;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .flow-node {
+            background: #f5f0e8;
+            border: 2px solid #c49a6c;
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        .flow-arrow {
+            color: #c49a6c;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .flow-equals {
+            display: block;
+            text-align: center;
+            color: #c49a6c;
+            font-size: 1.6em;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .conclusion-box {
+            background: linear-gradient(135deg, #c49a6c 0%, #b8895a 100%);
+            color: #fff;
+            border-radius: 14px;
+            padding: 32px;
+            margin: 32px 0;
+            text-align: center;
+        }
+
+        .conclusion-box .big-quote {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .conclusion-box .desc {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .note {
+            background: #fff8e6;
+            border-left: 4px solid #e8c06a;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 48px 0;
+            color: #d0c4b4;
+            font-size: 1.4em;
+            letter-spacing: 0.5em;
+        }
+
+        .example-box {
+            background: #f9f6f2;
+            border-radius: 10px;
+            padding: 22px 26px;
+            margin: 18px 0;
+            border: 1px dashed #d4c4b0;
+        }
+
+        .example-box .example-title {
+            font-weight: 700;
+            color: #8a6a40;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .original-text {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin: 24px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f0ebe3;
+            font-size: 0.92em;
+            line-height: 2;
+            color: #333;
+        }
+
+        .original-text .section-title {
+            font-weight: 700;
+            color: #c49a6c;
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #e0cdb8;
+        }
+
+        .original-text p {
+            text-indent: 2em;
+            margin-bottom: 12px;
+        }
+
+        .original-text .dialogue {
+            color: #555;
+        }
+
+        .original-text .speaker {
+            font-weight: 700;
+            color: #8a6a40;
+        }
+
+        .original-text .annotation {
+            color: #999;
+            font-size: 0.88em;
+            font-style: italic;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid #e8e0d5;
+            text-align: center;
+            color: #bbb;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<header>
+    <h1>王阳明 · 格物与诚意的逻辑之旅</h1>
+    <div class="subtitle">《传习录》核心章节解读</div>
+    <div class="meta">基于徐爱与王阳明对话整理 · 2026年6月</div>
+</header>
+
+<!-- 背景概述 -->
+<section>
+    <h2>一、对话背景</h2>
+
+    <p>这段长文出自王阳明的代表作《传习录》，记录了王阳明和他的得意弟子兼妹夫徐爱之间的一场深度对话。</p>
+
+    <div class="highlight-box">
+        <p style="margin-bottom:0">简单来说，这是<strong>心学史上的一场"世纪大辩论"</strong>。徐爱作为一个习惯了朱熹"格物致知"理论的读书人，在接触了王阳明的学说后产生了巨大的思想冲突。王阳明则通过这场对话，把自己的"心学"和朱熹的"理学"做了一次彻底的划界。</p>
+    </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- 原文 -->
+<section>
+    <h2>二、原文（《传习录》徐爱篇）</h2>
+
+    <div class="original-text">
+        <div class="section-title">【原文】</div>
+
+        <p><span class="speaker">爱问：</span>"昨闻先生'止至善'之教，已觉功夫有用力处。但与朱子'格物'之训，思之终不能合。"<br>
+        <span class="speaker">先生曰：</span>"格物是'止至善'之功，既知'至善'，即知'格物'矣。"</p>
+
+        <p><span class="speaker">爱曰：</span>"昨以先生之教推之'格物'之说，似亦见得大略。但朱子之训，其于《书》之'精一'，《论语》之'博约'，《孟子》之'尽心''知性'，皆有所证据，以是未能释然。"<br>
+        <span class="speaker">先生曰：</span>"子夏笃信圣人，曾子反求诸己。笃信固亦是，然不如反求之切。今既不得于心，安可狃于旧闻，不求是当？就如朱子，亦尊信程子，至其不得于心处，亦何尝苟从？'精一''博约''尽心'本自与吾说吻合，但未之思耳。朱子'格物'之训，未免牵合附会，非其本旨。精是一之功，博是约之功。曰仁既明'知行合一'之说，此可一言而喻。尽心、知性、知天，是'生知安行'事；存心、养性、事天，是'学知利行'事；夭寿不贰，修身以俟，是'困知勉行'事。朱子错训'格物'，只为倒看了此意，以'尽心''知性'为'物格知至'，要初学便去做'生知安行'事，如何做得？"</p>
+
+        <p><span class="speaker">爱问：</span>"'尽心''知性'，何以为'生知安行'？"<br>
+        <span class="speaker">先生曰：</span>"性是心之体，天是性之原，尽心即是尽性。'惟天下至诚为能尽其性，知天地之化育'。存心者，心有未尽也。知天，如知州、知县之'知'，是自己分上事，己与天为一。事天，如子之事父、臣之事君，须是恭敬奉承，然后能无失，尚与天为二，此便是圣贤之别。至于'夭寿不贰'其心，乃是教学者一心为善，不可以穷通夭寿之故，便把为善的心变动了，只去修身以俟命；见得穷通寿夭有个命在，我亦不必以此动心。事天，虽与天为二，已自见得个天在面前；俟命，便是未曾见面在此等候相似：此便是初学立心之始，有个困勉的意在。今却倒做了，所以使学者无下手处。"</p>
+
+        <p><span class="speaker">爱曰：</span>"昨闻先生之教，亦影影见得功夫须是如此。今闻此说，益无可疑。爱昨晚思'格物'的'物'字即是'事'字，皆从心上说。"<br>
+        <span class="speaker">先生曰：</span>"然。身之主宰便是心，心之所发便是意，意之本体便是知，意之所在便是物。如意在于事亲，即事亲便是一物；意在于事君，即事君便是一物；意在于仁民爱物，即仁民爱物便是一物；意在于视听言动，即视听言动便是一物。所以某说无心外之理，无心外之物。《中庸》言'不诚无物'，《大学》'明明德'之功，只是个诚意。诚意之功，只是个格物。"</p>
+    </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- 三个核心交锋点 -->
+<section>
+    <h2>三、三个核心交锋点</h2>
+
+    <h3>1. 什么是"物"？（死物 vs 活事）</h3>
+
+    <p>这是朱熹和王阳明最根本的分歧点。</p>
+
+    <table class="comparison-table">
+        <tr>
+            <th></th>
+            <th>朱熹的观点（向外格物）</th>
+            <th>王阳明的观点（心格物）</th>
+        </tr>
+        <tr>
+            <td><strong>对"物"的理解</strong></td>
+            <td>"物"就是客观世界万事万物（一草一木、典章制度）</td>
+            <td>"物"根本不是外在的死物，"物"就是"事"</td>
+        </tr>
+        <tr>
+            <td><strong>格物的方法</strong></td>
+            <td>像科学家一样去研究外在的客观规律（穷理），积少成多，有一天豁然贯通</td>
+            <td>在具体的人伦日用上做功夫，格物就是端正自己的心思</td>
+        </tr>
+    </table>
+
+    <div class="quote">
+        人看得"物"字是死的，先生看得"物"字是活的。
+        <div class="quote-author">—— 施邦曜 评</div>
+    </div>
+
+    <p>王阳明用了一个绝妙的逻辑链条（心学著名的"四句理"）来解释：</p>
+
+    <div class="four-sentence">
+        <div class="line"><strong>[身]</strong> 的主宰是 → <strong>[心]</strong></div>
+        <div class="line"><strong>[心]</strong> 动了念头是 → <strong>[意]</strong></div>
+        <div class="line"><strong>[意]</strong> 的本来面目是 → <strong>[知]</strong>（良知）</div>
+        <div class="line"><strong>[意]</strong> 所关注、所落脚的地方就是 → <strong>[物]</strong>（事）</div>
+    </div>
+
+    <div class="example-box">
+        <div class="example-title">举例说明</div>
+        <p>你坐在那里，外面的苹果树对你而言并不是心学意义上的"物"。但当你动了念头要去"孝敬父母"（意），并把这个念头落实在"给父母洗脚"这一具体行动上时，这个"洗脚的事件"就是"物"。所以，<strong>无心外之物，无心外之理</strong>。格物，其实就是端正自己的心思，在具体的人伦日用上做功夫。</p>
+    </div>
+
+    <h3>2. 功夫的"通关顺序"：朱熹把路带偏了？</h3>
+
+    <p>王阳明把修行的境界分成了三层（对应《中庸》的"三知三行"）：</p>
+
+    <table class="comparison-table">
+        <tr>
+            <th>境界层次</th>
+            <th>对应孟子的话</th>
+            <th>王阳明的解释</th>
+            <th>属于哪种人</th>
+        </tr>
+        <tr>
+            <td><strong>高级（满级大佬）</strong></td>
+            <td>尽心、知性、知天</td>
+            <td>己与天为一。像知州知县管辖本地一样，天理就是我分内的事。</td>
+            <td>生知安行（天生圣人）</td>
+        </tr>
+        <tr>
+            <td><strong>中级（进阶学者）</strong></td>
+            <td>存心、养性、事天</td>
+            <td>还要像儿子侍奉父亲一样恭敬，说明"我"和"天"还是两个个体。</td>
+            <td>学知利行（贤人君子）</td>
+        </tr>
+        <tr>
+            <td><strong>初级（萌新入坑）</strong></td>
+            <td>夭寿不贰，修身以俟</td>
+            <td>不管命好命坏、活长活短，我只管一心向善，等候天命。</td>
+            <td>困知勉行（初学大众）</td>
+        </tr>
+    </table>
+
+    <p><strong>朱熹错在哪？</strong> 朱熹认为，初学者一上来就要通过"格物"去达到"尽心知性"（满级状态）。王阳明认为：这太荒谬了！初学者怎么可能直接做圣人的事？初学者应该从最基础的"立心"开始，在日常事务中磨练自己，一步步往上修。</p>
+
+    <h3>3. 王阳明的"杠杆理论"：独立思考，不迷信权威</h3>
+
+    <p>徐爱说："朱熹可是大权威啊，他的话都有经典做凭证，我心里总是不踏实。"</p>
+
+    <div class="quote">
+        今既不得于心，安可狃于旧闻，不求是当？
+        <div class="quote-author">—— 王阳明</div>
+    </div>
+
+    <p>王阳明的意思是：如果你的内心觉得不通、不舒服，怎么能因为那是古人或权威说的话，就委屈自己去盲从呢？真理应该向内求（曾子的"反求诸己"），而不是向外迷信权威（子夏的"笃信圣人"）。</p>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- 格物是诚意的功夫 -->
+<section>
+    <h2>四、核心命题：格物是诚意的功夫</h2>
+
+    <h3>为什么说"格物是诚意的功夫"？</h3>
+
+    <p>在传统的《大学》读法里（比如朱熹的体系），"格物"和"诚意"是前后不同的两个步骤：先去研究外在的万物（格物），明白道理了，内心的意念才能真诚（诚意）。</p>
+
+    <p>但王阳明一听就觉得不对：这不就变成"知"和"行"脱节的两手功夫了吗？</p>
+
+    <p>王阳明之所以说"诚意之功，只是个格物"，是因为在他眼里，这两个词根本就是<strong>一回事的两个侧面</strong>："诚意"是内心的方向，而"格物"是实现这个方向的唯一手段。</p>
+
+    <h3>王阳明的逻辑链条</h3>
+
+    <div class="step-list">
+        <li data-step="1">
+            <div class="step-title">意念不能"悬空"存在</div>
+            <div class="step-content">
+                <p>王阳明认为，人的意念（意）是不可能凭空产生的，它必须有一个落脚点。比如，你产生了一个"孝顺"的念头，这个念头不能悬在半空中，它必然会落到一件具体的事情上——比如"给父母倒茶"或者"听父母说话"。这个意念所落脚的具体事情，就是王阳明眼中的"物"。</p>
+            </div>
+        </li>
+        <li data-step="2">
+            <div class="step-title">什么是"诚意"？</div>
+            <div class="step-content">
+                <p>"诚"就是真诚、纯粹。所谓"诚意"，就是让你的意念清清爽爽，对的念头就让它滋生，错的念头就把它卡死。当你产生"孝顺父母"的善念时，你要让它百分之百真诚，不掺杂应付和虚伪。当你产生"嫌父母烦"的恶念时，你要立刻警惕并除掉它。</p>
+            </div>
+        </li>
+        <li data-step="3">
+            <div class="step-title">怎么"诚"？只能在"物"上格！</div>
+            <div class="step-content">
+                <p>重点来了：你不能关起门来，坐在小黑屋里玩"意念拔河"来让它变真诚。你必须在具体的事情发生时去做功夫。</p>
+                <p>王阳明把"格物"的"格"解释为"正"（端正、纠正）："格者，正也。正其不正以归于正。"</p>
+                <p>当你"给父母倒茶"（意念所在的物）时，你恭恭敬敬地去倒，把不耐烦的心态纠正过来，这就是格物。当你把倒茶这件事"格"正了，你"孝顺"意念才真正达到了没有欺骗、毫无杂质的境界，这就是诚意。</p>
+            </div>
+        </li>
+    </li>
+</div>
+
+<div class="example-box">
+    <div class="example-title">💡 绝妙的现代比喻</div>
+    <p>假设你下定决心："我这辈子一定要好好爱我的伴侣。" —— 这叫发愿/诚意（内心的主观愿望）。</p>
+    <p>但你不能天天躺在沙发上闭着眼睛说"我很爱他/她"。当对方今天工作很累回家时，你主动去洗碗、放热水、听他/她发牢骚。"洗碗、放热水、倾听"就是"物"。</p>
+    <p>你在这些具体的事情上克制住自己想打游戏的欲望，耐心地去照顾对方（<strong>格物</strong>），这时候，你对伴侣的爱（<strong>诚意</strong>）才算真正落到了实处。</p>
+</div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- 逻辑推导全过程 -->
+<section>
+    <h2>五、逻辑推导全过程：这场对话是怎么一步步提出的？</h2>
+
+    <p>王阳明绝不是突然冒出"格物是诚意的功夫"这句话的，而是被徐爱的疑问<strong>一步步逼出来</strong>，最终水到渠成的。</p>
+
+    <div class="step-list">
+        <li data-step="一">
+            <div class="step-title">破旧立新 —— 扭转功夫的方向（向外 vs 向内）</div>
+            <div class="step-content">
+                <p><strong>文本背景：</strong>徐爱搬出朱熹的观点，说朱熹的"向外格物穷理"在各大经典里都有依据。</p>
+                <p><strong>阳明的逻辑：</strong>王阳明首先打破朱熹的权威。他指出朱熹把经典的顺序看颠倒了。圣人的境界（尽心知性）是终点，初学者的起点应该是"反求诸己"和"立心"。</p>
+                <p><strong>阶段结论：</strong>儒家的修行功夫，方向必须是向内（求诸心），而不是向外（求诸物）。</p>
+            </div>
+        </li>
+        <li data-step="二">
+            <div class="step-title">关键转折 —— 徐爱的思维跃迁（物 = 心上的事）</div>
+            <div class="step-content">
+                <p><strong>文本背景：</strong>听完王阳明纠正路线后，徐爱产生了一个极关键的顿悟："爱昨晚思'格物'的'物'字即是'事'字，皆从心上说。"</p>
+                <p><strong>徐爱的逻辑：</strong>既然先生说功夫要向内求、从心上做，那么经典里说的"格物"的"物"，就绝对不可能是外在的草木石头。如果去研究外物，功夫不就又跑到外面去了吗？所以，这个"物"只能是人做出的"事情"，而事情都是由心指引的。</p>
+                <p><strong>阶段结论：</strong>"物"被内在化了，它成了"心上的事"。</p>
+            </div>
+        </li>
+        <li data-step="三">
+            <div class="step-title">底层构筑 —— 阳明的"心-意-知-物"链条</div>
+            <div class="step-content">
+                <p><strong>文本背景：</strong>王阳明高度赞赏徐爱的开悟，接着给出了心学最核心的四句逻辑：</p>
+                <p style="text-align:center;font-style:italic;color:#c49a6c;margin:10px 0">"身之主宰便是心，心之所发便是意，意之本体便是知，意之所在便是物。"</p>
+                <p><strong>阳明的逻辑：</strong></p>
+                <ul style="margin-left:20px;margin-top:8px">
+                    <li>a. 你的肉体听谁的？听【心】的。</li>
+                    <li>b. 心一动，产生了具体的念头和倾向，这就叫【意】。</li>
+                    <li>c. 这个意念具体落脚在哪里呢？落脚在"侍奉父母"这件【事】上。</li>
+                    <li>d. 这件被你的意念所关注、所落脚的事，就叫做【物】。</li>
+                </ul>
+                <p><strong>阶段结论：</strong>"物"和"意"是分不开的，"物"就是"意"的落脚点和表现形式。</p>
+            </div>
+        </li>
+        <li data-step="四">
+            <div class="step-title">水到渠成 —— 推导出"格物即是诚意"</div>
+            <div class="step-content">
+                <p>到了这里，终极谜底终于揭开，逻辑线完美闭合：</p>
+                <ol style="margin-left:20px;margin-top:8px">
+                    <li>《大学》的核心要求是【诚意】（让自己的起心动念纯粹、真诚、没有私心）。</li>
+                    <li>但是，"意"是一个抽象的、看不见摸不着的念头。你怎么去让它变真诚？你没法凭空抓取一个念头来修改。</li>
+                    <li>幸好，根据第三步的逻辑，"意"一定会落脚在具体的事情【物】上。</li>
+                    <li>所以真正的战场在"物"上。你在具体的事情上，去纠正错误的偏向，保留正确的善念（这就是【格物】）。</li>
+                </ol>
+            </div>
+        </li>
+    </div>
+
+    <h3>逻辑闭环图</h3>
+
+    <div class="flow-chart">
+        <div class="flow-row">
+            <div class="flow-node">王阳明：功夫要向内求</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">徐爱：那"物"只能是心上的"事"</div>
+        </div>
+        <div class="flow-arrow" style="text-align:center;display:block;margin:8px 0">↓</div>
+        <div class="flow-row">
+            <div class="flow-node">王阳明（四句理）："物"就是"意念"的落脚点</div>
+        </div>
+        <div class="flow-arrow" style="text-align:center;display:block;margin:8px 0">↓</div>
+        <div class="flow-row">
+            <div class="flow-node">终极推论：要让"意念"真诚（诚意），只能在它落脚的"事情"（物）上纠偏（格物）</div>
+        </div>
+    </div>
+
+    <div class="conclusion-box">
+        <div class="big-quote">"诚意之功，只是个格物。"</div>
+        <div class="desc">这一步直接把《大学》里原本割裂的两个步骤，完美地熔铸成了一个知行合一的整体。</div>
+    </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- 总结 -->
+<section>
+    <h2>六、总结</h2>
+
+    <div class="highlight-box">
+        <p>通读这一段，你会发现王阳明非常擅长把宏大、玄妙的儒家经典"降维"到人人可操作的日常生活中。他把朱熹推向外在世界的目光，硬生生地拉回到人的内心。</p>
+        <p style="margin-bottom:0"><strong>用一句话概括这段话的精髓：</strong></p>
+        <p style="font-size:1.2em;text-align:center;font-weight:700;color:#c49a6c;margin:12px 0 0">别去外面找什么天理了，回到你的心。端正你的每一个起心动念，在具体的每一件事上知行合一，这就是最高明的格物。</p>
+    </div>
+</section>
+
+<footer>
+    <p>基于《传习录》徐爱篇整理 · 2026年6月7日</p>
+</footer>
+
+</div>
+</body>
+</html>
