@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linux 程序与进程学习笔记</title>
+  <style>
+    :root {
+      --blue: #3370ff;
+      --blue-soft: #eaf0ff;
+      --ink: #1f2329;
+      --muted: #646a73;
+      --faint: #8f959e;
+      --line: #dee0e3;
+      --panel: #f7f8fa;
+      --green: #00a870;
+      --green-soft: #e8f7f1;
+      --orange: #de7802;
+      --orange-soft: #fff4e6;
+      --red: #d83931;
+      --red-soft: #fff0ef;
+      --sidebar: 250px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font: 15px/1.72 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    .topbar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 20;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 22px;
+      background: rgba(255, 255, 255, .94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      color: #fff;
+      background: var(--blue);
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    .topbar-title { font-weight: 600; }
+    .topbar-meta { margin-left: auto; color: var(--faint); font-size: 13px; }
+
+    aside {
+      position: fixed;
+      inset: 56px auto 0 0;
+      width: var(--sidebar);
+      padding: 22px 14px;
+      overflow-y: auto;
+      background: #fbfbfc;
+      border-right: 1px solid #eef0f2;
+    }
+
+    .toc-label {
+      padding: 0 12px 8px;
+      color: var(--faint);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+    }
+
+    nav a {
+      display: block;
+      margin: 2px 0;
+      padding: 7px 12px;
+      color: var(--muted);
+      border-radius: 7px;
+      text-decoration: none;
+    }
+
+    nav a:hover, nav a.active { color: var(--blue); background: var(--blue-soft); }
+
+    main {
+      width: min(900px, calc(100% - var(--sidebar) - 64px));
+      margin-left: calc(var(--sidebar) + 32px);
+      padding: 104px 20px 96px;
+    }
+
+    .hero { margin-bottom: 46px; }
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    h1 { margin: 16px 0 10px; font-size: clamp(30px, 5vw, 42px); line-height: 1.25; }
+    .lead { max-width: 720px; margin: 0; color: var(--muted); font-size: 17px; }
+    section { margin: 52px 0; scroll-margin-top: 76px; }
+    h2 { margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid var(--line); font-size: 26px; }
+    h3 { margin: 28px 0 9px; font-size: 19px; }
+    p { margin: 10px 0; }
+    li { margin: 5px 0; }
+    strong { font-weight: 650; }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    :not(pre) > code { padding: 2px 5px; color: #d03a52; background: #f6f7f8; border-radius: 4px; font-size: .92em; }
+
+    pre {
+      margin: 14px 0;
+      padding: 17px 20px;
+      overflow-x: auto;
+      color: #d7dae0;
+      background: #1e2229;
+      border-radius: 9px;
+      font: 13px/1.7 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    pre .comment { color: #8b949e; }
+    .callout { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--blue); border-radius: 6px; background: var(--blue-soft); }
+    .callout.warning { border-color: var(--orange); background: var(--orange-soft); }
+    .callout.danger { border-color: var(--red); background: var(--red-soft); }
+    .callout.success { border-color: var(--green); background: var(--green-soft); }
+    .callout-title { margin-bottom: 4px; font-weight: 650; }
+    .callout p { margin: 3px 0; }
+
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+    .card { padding: 17px 18px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .card b { display: block; margin-bottom: 4px; }
+    .card p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .states { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; margin: 18px 0; }
+    .state { padding: 14px 8px; text-align: center; border: 1px solid var(--line); border-radius: 9px; }
+    .state-letter { display: block; color: var(--blue); font: 700 23px/1.2 monospace; }
+    .state-name { display: block; margin-top: 5px; font-size: 12px; color: var(--muted); }
+
+    table { width: 100%; margin: 16px 0; border-collapse: separate; border-spacing: 0; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+    th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: var(--panel); font-weight: 600; }
+    tr:last-child td { border-bottom: 0; }
+
+    .flow { display: flex; align-items: center; gap: 8px; margin: 20px 0; }
+    .flow div:not(.arrow) { flex: 1; padding: 14px; text-align: center; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+    .arrow { color: var(--faint); font-size: 20px; }
+
+    .checklist { padding: 0; list-style: none; }
+    .checklist li { position: relative; padding: 6px 0 6px 30px; }
+    .checklist li::before {
+      position: absolute;
+      left: 0;
+      top: 8px;
+      content: "✓";
+      display: grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    footer { margin-top: 64px; padding-top: 20px; color: var(--faint); border-top: 1px solid var(--line); font-size: 13px; }
+
+    @media (max-width: 760px) {
+      aside, .topbar-meta { display: none; }
+      main { width: 100%; margin: 0; padding: 88px 20px 64px; }
+      .cards { grid-template-columns: 1fr; }
+      .states { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flow { flex-direction: column; align-items: stretch; }
+      .arrow { align-self: center; transform: rotate(90deg); }
+    }
+
+    @media print {
+      .topbar, aside { display: none; }
+      main { width: 100%; margin: 0; padding: 20px; }
+      section { break-inside: avoid; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">L</div>
+    <div class="topbar-title">Linux 学习笔记</div>
+    <div class="topbar-meta">程序、进程、信号与 /proc</div>
+  </header>
+
+  <aside>
+    <div class="toc-label">目录</div>
+    <nav>
+      <a href="#overview">笔记概览</a>
+      <a href="#program-process">程序与进程</a>
+      <a href="#pid">PID 与 PPID</a>
+      <a href="#states">进程状态</a>
+      <a href="#jobs">前台、后台与作业</a>
+      <a href="#signals">SIGTERM 与 SIGKILL</a>
+      <a href="#proc">/proc 运行时视图</a>
+      <a href="#summary">速记总结</a>
+    </nav>
+  </aside>
+
+  <main>
+    <article>
+      <header class="hero" id="overview">
+        <span class="tag">Linux · 进程基础</span>
+        <h1>程序、进程、信号与 /proc</h1>
+        <p class="lead">程序是磁盘上的文件；进程是内核把程序加载并运行后创建的实例；<code>/proc</code> 是观察这些运行实例和内核状态的窗口。</p>
+      </header>
+
+      <section id="program-process">
+        <h2>一、程序与进程</h2>
+        <div class="cards">
+          <div class="card">
+            <b>程序是静态文件</b>
+            <p>例如 <code>/bin/ls</code>、<code>/usr/bin/bash</code> 或 <code>./app</code>，保存着可执行指令。</p>
+          </div>
+          <div class="card">
+            <b>进程是动态实例</b>
+            <p>程序执行后，内核为它建立运行状态、内存空间和资源记录。</p>
+          </div>
+        </div>
+
+        <p>程序文件本身不会持续占用 CPU。执行程序后，内核创建进程，进程通常拥有：</p>
+        <ul>
+          <li>进程编号和 CPU 执行状态；</li>
+          <li>独立的虚拟内存空间；</li>
+          <li>打开的文件、当前工作目录和环境变量；</li>
+          <li>运行用户、组及相应权限。</li>
+        </ul>
+
+        <pre><span class="comment"># 同一个程序可以启动多个进程实例</span>
+./app &amp;
+./app &amp;
+./app &amp;</pre>
+
+        <div class="flow">
+          <div>程序文件 <code>./app</code></div>
+          <div class="arrow">→</div>
+          <div>进程 1001</div>
+          <div>进程 1002</div>
+          <div>进程 1003</div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-title">程序和进程的生命周期不同</div>
+          <p>进程结束后，程序文件通常仍在磁盘上；删除程序文件也不一定立即终止已经加载并运行的进程。</p>
+        </div>
+      </section>
+
+      <section id="pid">
+        <h2>二、PID 与 PPID</h2>
+        <p><strong>PID（Process ID）</strong>是内核分配给进程的编号，在同一时刻唯一。进程退出后，其 PID 将来可能被其他进程重复使用。</p>
+        <p><strong>PPID（Parent Process ID）</strong>是父进程的 PID。在 Bash 中执行 <code>./app</code> 时，Bash 通常是 <code>app</code> 的父进程。</p>
+
+        <pre><span class="comment"># 当前 shell 的 PID</span>
+echo $$
+
+<span class="comment"># 同时查看 PID、PPID、状态和命令</span>
+ps -o pid,ppid,state,cmd</pre>
+
+        <pre>  PID  PPID S CMD
+ 2000  1500 S bash
+ 2100  2000 R ./app</pre>
+
+        <div class="callout success">
+          <div class="callout-title">PID 与作业编号不是一回事</div>
+          <p>PID 由内核管理；<code>%1</code> 这样的作业编号由当前 Shell 管理，只在该 Shell 会话中有意义。</p>
+        </div>
+      </section>
+
+      <section id="states">
+        <h2>三、进程状态 R / S / D / T / Z</h2>
+        <div class="states">
+          <div class="state"><span class="state-letter">R</span><span class="state-name">运行或可运行</span></div>
+          <div class="state"><span class="state-letter">S</span><span class="state-name">可中断睡眠</span></div>
+          <div class="state"><span class="state-letter">D</span><span class="state-name">不可中断睡眠</span></div>
+          <div class="state"><span class="state-letter">T</span><span class="state-name">暂停或跟踪</span></div>
+          <div class="state"><span class="state-letter">Z</span><span class="state-name">僵尸</span></div>
+        </div>
+
+        <table>
+          <thead><tr><th>状态</th><th>含义</th><th>需要记住的细节</th></tr></thead>
+          <tbody>
+            <tr><td><code>R</code></td><td>Running / Runnable</td><td>正在使用 CPU，或者已经就绪并等待 CPU；不一定此刻正在执行。</td></tr>
+            <tr><td><code>S</code></td><td>Interruptible Sleep</td><td>等待输入、网络数据、定时器等事件，可以被信号唤醒；非常常见。</td></tr>
+            <tr><td><code>D</code></td><td>Uninterruptible Sleep</td><td>通常在等待内核 I/O。信号要等它从内核等待中返回后才能生效。</td></tr>
+            <tr><td><code>T</code></td><td>Stopped / Traced</td><td>被暂停或被调试器跟踪，<code>Ctrl+Z</code> 可使前台进程进入暂停状态。</td></tr>
+            <tr><td><code>Z</code></td><td>Zombie</td><td>已经结束，但父进程尚未读取退出状态，只剩进程表记录。</td></tr>
+          </tbody>
+        </table>
+
+        <pre>ps -o pid,ppid,state,cmd</pre>
+
+        <div class="callout warning">
+          <div class="callout-title"><code>D</code> 状态不一定能被 kill -9 立即清除</div>
+          <p><code>SIGKILL</code> 已经处于等待状态，但进程必须先从不可中断的内核操作返回，内核才能完成终止。</p>
+        </div>
+
+        <div class="callout danger">
+          <div class="callout-title">不能再次“杀死”僵尸进程</div>
+          <p><code>Z</code> 进程已经结束。应由父进程调用 <code>wait()</code> 回收退出状态，或者处理行为异常的父进程。</p>
+        </div>
+      </section>
+
+      <section id="jobs">
+        <h2>四、前台、后台与作业控制</h2>
+        <h3>前台作业</h3>
+        <p>直接运行的命令通常成为终端的前台作业，可以读取终端输入：</p>
+        <pre>sleep 100</pre>
+        <ul>
+          <li><code>Ctrl+C</code>：通常向前台进程组发送 <code>SIGINT</code>，请求中断。</li>
+          <li><code>Ctrl+Z</code>：通常发送 <code>SIGTSTP</code>，暂停前台作业。</li>
+        </ul>
+
+        <h3>后台作业</h3>
+        <p>命令末尾加 <code>&amp;</code>，Shell 会立即返回提示符，命令则在后台运行：</p>
+        <pre>sleep 100 &amp;</pre>
+        <p>后台作业通常不能直接读取终端输入，否则可能被 Shell 暂停。</p>
+
+        <h3>常用作业控制命令</h3>
+        <pre>jobs          <span class="comment"># 查看当前 Shell 的作业</span>
+fg %2         <span class="comment"># 把作业 2 放到前台继续</span>
+bg %2         <span class="comment"># 让作业 2 在后台继续</span>
+kill %1       <span class="comment"># 向作业 1 发送信号</span></pre>
+
+        <div class="callout warning">
+          <div class="callout-title">后台运行不等于脱离终端</div>
+          <p>终端关闭后，普通后台进程不一定继续运行。临时需求可使用 <code>nohup</code>，长期服务通常应交给 <code>systemd</code> 管理。</p>
+        </div>
+
+        <pre>nohup command &gt;output.log 2&gt;&amp;1 &amp;</pre>
+      </section>
+
+      <section id="signals">
+        <h2>五、SIGTERM 与 SIGKILL</h2>
+        <p><code>kill</code> 命令的本质是<strong>发送信号</strong>，并非固定执行强制终止。</p>
+
+        <div class="cards">
+          <div class="card">
+            <b>SIGTERM（15）：请求正常退出</b>
+            <p>进程可以捕获、处理或忽略它，并有机会保存数据、关闭文件和释放资源。</p>
+          </div>
+          <div class="card">
+            <b>SIGKILL（9）：强制终止</b>
+            <p>不能被捕获、忽略或阻塞，进程没有机会执行自己的清理代码。</p>
+          </div>
+        </div>
+
+        <pre><span class="comment"># 默认发送 SIGTERM</span>
+kill PID
+kill -TERM PID
+kill -15 PID
+
+<span class="comment"># 强制终止</span>
+kill -KILL PID
+kill -9 PID</pre>
+
+        <div class="flow">
+          <div>先发送 SIGTERM</div>
+          <div class="arrow">→</div>
+          <div>等待进程清理退出</div>
+          <div class="arrow">→</div>
+          <div>仍无响应时考虑 SIGKILL</div>
+        </div>
+
+        <div class="callout danger">
+          <div class="callout-title">SIGKILL 是最后手段</div>
+          <p>它可能造成数据未写完、事务中断或临时文件残留。内核会回收进程资源，但不会替程序完成业务层清理。</p>
+        </div>
+      </section>
+
+      <section id="proc">
+        <h2>六、/proc 是内核运行时视图</h2>
+        <p><code>/proc</code> 通常是内核提供的虚拟文件系统。它不是磁盘上的普通文件集合，而是把进程和内核的实时状态表示成目录与文件。</p>
+
+        <pre><span class="comment"># 数字目录对应进程 PID</span>
+/proc/1/
+/proc/1234/
+
+<span class="comment"># 查看指定进程</span>
+cat /proc/1234/status
+tr '\0' ' ' &lt;/proc/1234/cmdline
+readlink /proc/1234/exe
+readlink /proc/1234/cwd
+ls -l /proc/1234/fd</pre>
+
+        <table>
+          <thead><tr><th>路径</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td><code>/proc/PID/status</code></td><td>进程状态、PID、PPID、内存等摘要信息</td></tr>
+            <tr><td><code>/proc/PID/cmdline</code></td><td>启动进程时的命令行参数，以空字节分隔</td></tr>
+            <tr><td><code>/proc/PID/exe</code></td><td>指向进程对应可执行文件的符号链接</td></tr>
+            <tr><td><code>/proc/PID/cwd</code></td><td>指向进程当前工作目录的符号链接</td></tr>
+            <tr><td><code>/proc/PID/fd/</code></td><td>进程已经打开的文件描述符</td></tr>
+            <tr><td><code>/proc/self</code></td><td>指向当前访问 <code>/proc</code> 的进程</td></tr>
+          </tbody>
+        </table>
+
+        <pre><span class="comment"># 当前 Shell 对应的进程目录</span>
+ls -l /proc/$$
+
+<span class="comment"># 系统级运行信息</span>
+cat /proc/cpuinfo
+cat /proc/meminfo
+cat /proc/loadavg
+cat /proc/uptime</pre>
+
+        <div class="callout">
+          <div class="callout-title">读取时由内核生成</div>
+          <p><code>/proc</code> 内容随系统实时变化。进程退出后，其 <code>/proc/PID</code> 目录随即消失；某些信息还会受到用户权限和安全配置限制。</p>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">谨慎修改 /proc/sys</div>
+          <p><code>/proc/sys</code> 中的部分文件可用于调整内核参数，写入会影响正在运行的系统，不应当把它们当成普通文本文件随意修改。</p>
+        </div>
+      </section>
+
+      <section id="summary">
+        <h2>七、速记总结</h2>
+        <ul class="checklist">
+          <li>程序是静态文件，进程是程序的一次动态运行实例。</li>
+          <li>PID 标识进程，PPID 指向创建它的父进程。</li>
+          <li><code>R/S/D/T/Z</code> 分别表示可运行、可中断睡眠、不可中断睡眠、暂停和僵尸。</li>
+          <li>作业编号属于当前 Shell，PID 属于操作系统内核。</li>
+          <li>优先使用 <code>SIGTERM</code>，必要时才使用 <code>SIGKILL</code>。</li>
+          <li><code>/proc</code> 是内核状态的实时视图，不是普通磁盘目录。</li>
+        </ul>
+      </section>
+    </article>
+
+    <footer>Linux 学习笔记 · 程序与进程 · 更新于 2026-06-15</footer>
+  </main>
+
+  <script>
+    const links = [...document.querySelectorAll('nav a')];
+    const targets = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      if (!visible) return;
+      links.forEach(link => link.classList.toggle(
+        'active', link.getAttribute('href') === `#${visible.target.id}`
+      ));
+    }, { rootMargin: '-70px 0px -72% 0px' });
+    targets.forEach(target => observer.observe(target));
+  </script>
+</body>
+</html>
