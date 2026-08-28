@@ -13,17 +13,17 @@
 
 - **前端基础**：HTML、HTTP、REST、CSS 历史及交互式示例
 - **Linux 学习**：程序、进程、信号与 `/proc` 文件系统
+- **项目实践**：联机飞行棋架构学习报告、贪吃蛇游戏设计方案
+- **后端科普**：面向 C++ 初学者的 Node.js、HTTP 与 WebSocket 讲解
 - **GitHub Pages**：静态网页托管指南与完整实践攻略
-- **游戏设计**：贪吃蛇游戏核心设计方案
 - **哲学思考**：王阳明“格物”“诚意”与《传习录》解读
 - **文本解读**：《无用清净梦》《一如年少模样》等歌词赏析
 
 ## 项目特点
 
 - 无构建流程、无第三方依赖，浏览器即可运行
-- 首页以卡片形式统一展示和分类笔记
+- 首页按“项目与工程、编程与系统、阅读与思考”分类展示笔记
 - 笔记页面支持独立设计，也提供 `style/notes.css` 公共样式和多套主题色
-- 支持在首页临时添加资料索引，数据保存在浏览器 `localStorage`
 - 适合直接托管在 GitHub Pages 等静态网站服务上
 
 ## 本地运行
@@ -54,6 +54,8 @@ ai-notebook/
 ├── html资源与REST.html                # Resource、REST 与缓存
 ├── css历史.html                       # CSS 历史与交互示例
 ├── linux-process-notes.html           # Linux 程序与进程笔记
+├── Node.js_给C++初学者的科普报告.html   # Node.js、HTTP 与 WebSocket 科普
+├── 联机飞行棋_给C++初学者的学习报告.html # 联机游戏架构学习报告
 ├── GitHub Pages 托管指南.html          # GitHub Pages 快速指南
 ├── GitHub Pages 全攻略.html            # GitHub Pages 完整攻略
 ├── 贪吃蛇游戏核心设计方案.html          # 游戏设计文档
@@ -72,9 +74,9 @@ ai-notebook/
    <body class="theme-html">
    ```
 
-3. 在 `index.html` 的 `BUILTIN` 数组中登记文件名、分类、标签和日期。
+3. 在 `index.html` 对应分类中新增一张卡片，填写相对链接、标题和简介。
 
-首页的“添加资料”功能只会把索引记录保存在当前浏览器中，不会自动创建文件，也不会提交到 Git 仓库。需要长期保留的内容仍应写入源码并更新 `BUILTIN`。
+首页只索引仓库中真实存在的页面。新增或删除笔记时，应同步维护首页卡片，避免产生失效链接。
 
 ## 部署到 GitHub Pages
 

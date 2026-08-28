@@ -1,281 +1,319 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>学习资料收集</title>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="个人学习笔记：技术学习、项目实践与阅读思考。">
+  <title>AI Notebook · 我的学习笔记</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1f2328;
+      --muted: #6b7280;
+      --soft: #9ca3af;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+    }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f5f5;
-    color: #333;
-    min-height: 100vh;
-  }
+    * { box-sizing: border-box; }
 
-  .header {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    color: #fff;
-    padding: 48px 24px 32px;
-    text-align: center;
-  }
-  .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
-  .header p  { font-size: 0.9rem; opacity: 0.85; }
+    html { scroll-behavior: smooth; }
 
-  .container { max-width: 800px; margin: 0 auto; padding: 28px 16px 60px; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                   "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(37, 99, 235, .08), transparent 34rem),
+        var(--bg);
+      color: var(--text);
+    }
 
-  .section-header {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
-  }
-  .section-title { font-size: 1.05rem; font-weight: 600; color: #555; }
+    .page {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 72px 0 40px;
+    }
 
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer;
-    font-size: 0.9rem; font-weight: 500; transition: all 0.2s;
-  }
-  .btn-primary {
-    background: #4f46e5; color: #fff;
-  }
-  .btn-primary:hover { background: #4338ca; }
-  .btn-sm {
-    padding: 4px 12px; font-size: 0.78rem; border-radius: 6px;
-    background: #fee2e2; color: #dc2626;
-  }
-  .btn-sm:hover { background: #fecaca; }
+    .hero {
+      text-align: center;
+      margin-bottom: 52px;
+    }
 
-  .card-list { display: flex; flex-direction: column; gap: 10px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .16em;
+    }
 
-  .card {
-    background: #fff; border-radius: 10px; padding: 18px 22px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-    transition: box-shadow 0.2s, transform 0.2s;
-    display: flex; align-items: center; gap: 14px;
-    text-decoration: none; color: inherit;
-  }
-  .card:hover {
-    box-shadow: 0 4px 18px rgba(0,0,0,0.10);
-    transform: translateY(-2px);
-  }
+    .eyebrow::before,
+    .eyebrow::after {
+      content: "";
+      width: 22px;
+      height: 1px;
+      background: currentColor;
+      opacity: .45;
+    }
 
-  .card-icon {
-    width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-  }
-  .icon-html { background: #fef3c7; }
-  .icon-pdf  { background: #fce7f3; }
-  .icon-doc  { background: #dbeafe; }
-  .icon-code { background: #d1fae5; }
-  .icon-text { background: #ede9fe; }
-  .icon-other { background: #f3f4f6; }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 6vw, 44px);
+      font-weight: 700;
+      letter-spacing: -.04em;
+    }
 
-  .card-info { flex: 1; min-width: 0; }
-  .card-title {
-    font-size: 0.98rem; font-weight: 600; margin-bottom: 2px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .card-meta { font-size: 0.78rem; color: #999; display: flex; gap: 12px; }
-  .card-arrow { color: #ccc; font-size: 1rem; flex-shrink: 0; }
+    .hero > p {
+      max-width: 580px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 15px;
+    }
 
-  /* modal */
-  .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
-    display: flex; align-items: center; justify-content: center; z-index: 100;
-  }
-  .overlay.hidden { display: none; }
+    .summary {
+      display: inline-flex;
+      gap: 8px;
+      margin-top: 22px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .72);
+      color: var(--muted);
+      font-size: 12px;
+    }
 
-  .modal {
-    background: #fff; border-radius: 14px; padding: 28px 30px;
-    width: 90%; max-width: 460px; box-shadow: 0 8px 40px rgba(0,0,0,0.18);
-  }
-  .modal h3 { font-size: 1.15rem; margin-bottom: 20px; }
-  .modal label { display: block; font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 4px; margin-top: 14px; }
-  .modal label:first-of-type { margin-top: 0; }
-  .modal input, .modal select {
-    width: 100%; padding: 10px 12px; border: 1.5px solid #ddd; border-radius: 8px;
-    font-size: 0.92rem; outline: none; transition: border-color 0.2s;
-  }
-  .modal input:focus, .modal select:focus { border-color: #4f46e5; }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
-  .btn-cancel { background: #f3f4f6; color: #555; }
-  .btn-cancel:hover { background: #e5e7eb; }
+    section { margin-top: 40px; }
 
-  .tag {
-    display: inline-block; padding: 2px 8px; border-radius: 4px;
-    font-size: 0.72rem; font-weight: 600;
-    background: #ede9fe; color: #7c3aed;
-  }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
 
-  .footer { text-align: center; padding: 16px; font-size: 0.78rem; color: #bbb; }
+    .section-head h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: -.01em;
+    }
 
-  @media (max-width: 500px) {
-    .header { padding: 36px 16px 24px; }
-    .header h1 { font-size: 1.5rem; }
-  }
-</style>
+    .section-head span {
+      color: var(--soft);
+      font-size: 12px;
+    }
+
+    .links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      min-height: 104px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--card);
+      color: var(--text);
+      text-decoration: none;
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: #cbd5e1;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, .07);
+    }
+
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #f3f4f6;
+      font-size: 22px;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .card small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .arrow {
+      color: var(--soft);
+      font-size: 20px;
+      transition: transform .16s ease, color .16s ease;
+    }
+
+    .card:hover .arrow {
+      transform: translateX(3px);
+      color: var(--accent);
+    }
+
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 54px;
+      padding: 22px 0;
+      border-top: 1px solid var(--border);
+      color: var(--soft);
+      font-size: 12px;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 680px) {
+      .page { padding-top: 48px; }
+      .hero { margin-bottom: 38px; }
+      .links { grid-template-columns: 1fr; }
+      .card { min-height: 96px; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
+    <header class="hero">
+      <div class="eyebrow">AI NOTEBOOK</div>
+      <h1>📚 我的学习笔记</h1>
+      <p>把技术学习、项目实践与阅读思考整理成可以随时回看的独立页面。</p>
+      <div class="summary"><span>14 篇内容</span><span>·</span><span>持续更新</span></div>
+    </header>
 
-<div class="header">
-  <h1>学习资料收集</h1>
-  <p>整理和索引近期的学习材料</p>
-</div>
-
-<div class="container">
-  <div class="section-header">
-    <h2 class="section-title">资料列表</h2>
-    <button class="btn btn-primary" onclick="openModal()">+ 添加资料</button>
-  </div>
-
-  <div class="card-list" id="cardList"></div>
-  <div id="empty" style="text-align:center;padding:60px 20px;color:#aaa;">
-    <div style="font-size:2.8rem;margin-bottom:10px;">📂</div>
-    <p>暂无学习资料，点击上方按钮添加</p>
-  </div>
-</div>
-
-<div class="footer" id="footer"></div>
-
-<!-- Add Modal -->
-<div class="overlay hidden" id="overlay" onclick="maybeClose(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h3>添加学习资料</h3>
-    <label>文件名（含扩展名）</label>
-    <input type="text" id="inputFile" placeholder="例如：react-notes.html">
-
-    <label>分类</label>
-    <select id="inputType">
-      <option value="html">HTML / 网页</option>
-      <option value="pdf">PDF 文档</option>
-      <option value="doc">Word 文档</option>
-      <option value="code">代码</option>
-      <option value="text">文本 / 笔记</option>
-      <option value="other">其他</option>
-    </select>
-
-    <label>标签（可选）</label>
-    <input type="text" id="inputTag" placeholder="例如：前端、AI、算法">
-
-    <div class="modal-actions">
-      <button class="btn btn-cancel" onclick="closeModal()">取消</button>
-      <button class="btn btn-primary" onclick="addItem()">确定</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const STORAGE_KEY = 'myweb_study_items';
-const BUILTIN = [
-  { file: '贪吃蛇游戏核心设计方案.html', type: 'html', tag: '游戏', added: '2026-05-27' },
-  { file: 'GitHub Pages 托管指南.html', type: 'html', tag: '教程', added: '2026-05-27' },
-  { file: 'GitHub Pages 全攻略.html', type: 'html', tag: '教程', added: '2026-05-27' },
-  { file: '无用清净梦-歌词解读.html', type: 'html', tag: '歌词', added: '2026-06-04' },
-  { file: '一如年少模样-歌词解读.html', type: 'html', tag: '歌词', added: '2026-06-04' },
-  { file: 'wang-yangming-gewu.html', type: 'html', tag: '哲学', added: '2026-06-07' },
-  { file: 'wang-yangming-chuanxi-lu-6.html', type: 'html', tag: '哲学', added: '2026-06-08' },
-  { file: 'css历史.html', type: 'html', tag: '前端', added: '2026-06-10' },
-  { file: 'todolist.html', type: 'html', tag: 'JS练习', added: '2026-06-11' },
-  { file: 'JavaScript-TodoList教程.html', type: 'html', tag: 'JS教程', added: '2026-06-11' },
-  { file: 'lottery.html', type: 'html', tag: 'JS练习', added: '2026-06-11' },
-  { file: 'countdown.html', type: 'html', tag: 'JS练习', added: '2026-06-11' },
-  { file: 'calculator.html', type: 'html', tag: 'JS练习', added: '2026-06-11' },
-  { file: 'linux-process-notes.html', type: 'html', tag: 'Linux', added: '2026-06-15' }
-];
-
-const TYPE_ICON = {
-  html: '🌐', pdf: '📄', doc: '📝', code: '💻', text: '📋', other: '📎'
-};
-const TYPE_CLS = {
-  html: 'icon-html', pdf: 'icon-pdf', doc: 'icon-doc', code: 'icon-code', text: 'icon-text', other: 'icon-other'
-};
-
-function loadItems() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
-
-function saveItems(items) { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
-
-function render() {
-  const userItems = loadItems();
-  const all = [...BUILTIN];
-  userItems.forEach(u => {
-    if (!all.find(b => b.file === u.file)) all.push(u);
-  });
-
-  const listEl = document.getElementById('cardList');
-  const emptyEl = document.getElementById('empty');
-
-  if (!all.length) {
-    listEl.innerHTML = '';
-    emptyEl.style.display = '';
-  } else {
-    emptyEl.style.display = 'none';
-    listEl.innerHTML = all.map((item, i) => `
-      <a class="card" href="${item.file}" target="_blank">
-        <div class="card-icon ${TYPE_CLS[item.type] || 'icon-other'}">${TYPE_ICON[item.type] || '📎'}</div>
-        <div class="card-info">
-          <div class="card-title">${item.file}</div>
-          <div class="card-meta">
-            <span>${item.added || ''}</span>
-            ${item.tag ? `<span class="tag">${item.tag}</span>` : ''}
-          </div>
+    <main>
+      <section>
+        <div class="section-head">
+          <h2>项目与工程</h2>
+          <span>4 篇</span>
         </div>
-        <span class="card-arrow">→</span>
-      </a>
-    `).join('');
-  }
+        <div class="links">
+          <a class="card" href="联机飞行棋_给C++初学者的学习报告.html">
+            <span class="icon">🎲</span>
+            <span><strong>联机飞行棋学习报告</strong><small>从 C++ 视角理解 Node.js、WebSocket 与联机游戏架构</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="贪吃蛇游戏核心设计方案.html">
+            <span class="icon">🐍</span>
+            <span><strong>贪吃蛇游戏核心设计</strong><small>从状态、规则到主循环的无代码设计方案</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="GitHub Pages 托管指南.html">
+            <span class="icon">🚀</span>
+            <span><strong>GitHub Pages 托管指南</strong><small>把静态网页发布到互联网的快速实践</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="GitHub Pages 全攻略.html">
+            <span class="icon">🗺️</span>
+            <span><strong>GitHub Pages 全攻略</strong><small>理解仓库、分支、部署与访问地址</small></span>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+      </section>
 
-  document.getElementById('footer').textContent =
-    `共 ${all.length} 项 · ${new Date().toLocaleString('zh-CN')}`;
-}
+      <section>
+        <div class="section-head">
+          <h2>编程与系统</h2>
+          <span>6 篇</span>
+        </div>
+        <div class="links">
+          <a class="card" href="Node.js_给C++初学者的科普报告.html">
+            <span class="icon">🟢</span>
+            <span><strong>Node.js：给 C++ 初学者的科普</strong><small>用熟悉的 C++ 概念理解 JavaScript 服务端</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="linux-process-notes.html">
+            <span class="icon">🐧</span>
+            <span><strong>Linux 程序与进程</strong><small>程序、进程、信号与 /proc 学习笔记</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="html是什么.html">
+            <span class="icon">🧱</span>
+            <span><strong>HTML 是什么？</strong><small>一份面向代码初学者的网页结构科普</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="html笔记.html">
+            <span class="icon">🌐</span>
+            <span><strong>HTML 与 HTTP 学习笔记</strong><small>从页面结构走向浏览器与服务器通信</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="html资源与REST.html">
+            <span class="icon">🔗</span>
+            <span><strong>Resource、REST 与缓存</strong><small>理解资源、可寻址性和 Web 缓存</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="css历史.html">
+            <span class="icon">🎨</span>
+            <span><strong>CSS 的诞生</strong><small>一段关于网页失控与样式系统形成的历史</small></span>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+      </section>
 
-function openModal() {
-  document.getElementById('overlay').classList.remove('hidden');
-  document.getElementById('inputFile').focus();
-}
-function closeModal() {
-  document.getElementById('overlay').classList.add('hidden');
-  document.getElementById('inputFile').value = '';
-  document.getElementById('inputTag').value = '';
-  document.getElementById('inputType').value = 'html';
-}
-function maybeClose(e) { if (e.target === e.currentTarget) closeModal(); }
+      <section>
+        <div class="section-head">
+          <h2>阅读与思考</h2>
+          <span>4 篇</span>
+        </div>
+        <div class="links">
+          <a class="card" href="wang-yangming-gewu.html">
+            <span class="icon">🪷</span>
+            <span><strong>王阳明：格物与诚意</strong><small>从概念关系进入知行合一的逻辑</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="wang-yangming-chuanxi-lu-6.html">
+            <span class="icon">📜</span>
+            <span><strong>《传习录》第六条</strong><small>王阳明“格物”之旨的逐层解读</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="无用清净梦-歌词解读.html">
+            <span class="icon">🏞️</span>
+            <span><strong>《无用清净梦》歌词解读</strong><small>山水、清净与“无用”的生活哲思</small></span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="card" href="一如年少模样-歌词解读.html">
+            <span class="icon">🎵</span>
+            <span><strong>《一如年少模样》歌词解读</strong><small>被生活磨过之后，仍保留一点少年气</small></span>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+      </section>
+    </main>
 
-function addItem() {
-  const file = document.getElementById('inputFile').value.trim();
-  const type = document.getElementById('inputType').value;
-  const tag  = document.getElementById('inputTag').value.trim();
-  if (!file) return alert('请输入文件名');
-
-  const items = loadItems();
-  const today = new Date().toISOString().slice(0, 10);
-  items.push({ file, type, tag, added: today });
-  saveItems(items);
-  closeModal();
-  render();
-}
-
-// Delete item (for future use)
-function removeItem(file) {
-  const items = loadItems().filter(i => i.file !== file);
-  saveItems(items);
-  render();
-}
-
-// Keyboard shortcut
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-  if (e.key === 'Enter' && !document.getElementById('overlay').classList.contains('hidden')) {
-    addItem();
-  }
-});
-
-render();
-</script>
-
+    <footer>
+      <span>AI Notebook · 个人学习资料库</span>
+      <span><a href="https://github.com/zhangxian371/ai-notebook">GitHub 仓库</a> · <a href="https://zhangxian371.github.io/ai-notebook/">在线访问</a></span>
+    </footer>
+  </div>
 </body>
 </html>
