@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sandbox：程序员在谈什么？</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --panel2:#172033;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#293449;
+      --accent:#60a5fa;
+      --accent2:#34d399;
+      --warn:#fbbf24;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(96,165,250,.12), transparent 28%),
+        radial-gradient(circle at 85% 10%, rgba(52,211,153,.08), transparent 24%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.75;
+    }
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:56px 24px 72px;
+    }
+    .hero{
+      margin-bottom:30px;
+    }
+    .eyebrow{
+      color:var(--accent);
+      font-weight:700;
+      letter-spacing:.08em;
+      font-size:14px;
+      text-transform:uppercase;
+    }
+    h1{
+      margin:8px 0 12px;
+      font-size:42px;
+      line-height:1.2;
+    }
+    .lead{
+      margin:0;
+      color:var(--muted);
+      font-size:18px;
+      max-width:820px;
+    }
+    .quote{
+      margin:28px 0 34px;
+      background:linear-gradient(135deg, rgba(96,165,250,.12), rgba(52,211,153,.08));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:22px 24px;
+      font-size:20px;
+    }
+    .quote b{color:white}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:18px;
+    }
+    .card{
+      background:rgba(17,24,39,.88);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:22px;
+      box-shadow:0 12px 30px rgba(0,0,0,.14);
+    }
+    .card.full{grid-column:1/-1}
+    .num{
+      width:34px;height:34px;
+      border-radius:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(96,165,250,.13);
+      color:var(--accent);
+      font-weight:800;
+      margin-bottom:10px;
+    }
+    h2{
+      margin:0 0 10px;
+      font-size:22px;
+    }
+    .card p{
+      margin:8px 0;
+      color:#d1d5db;
+    }
+    .q{
+      color:white;
+      font-weight:700;
+    }
+    .examples{
+      margin-top:12px;
+      padding:14px 16px;
+      background:var(--panel2);
+      border-radius:12px;
+      color:var(--muted);
+      font-size:15px;
+    }
+    .examples b{color:var(--accent2)}
+    .scenario{
+      margin-top:32px;
+      background:rgba(17,24,39,.88);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:24px;
+    }
+    .scenario h2{margin-bottom:8px}
+    .flow{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px;
+      margin:18px 0 4px;
+    }
+    .step{
+      padding:8px 12px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--panel2);
+    }
+    .arrow{color:var(--muted)}
+    .bad{
+      color:var(--warn);
+      font-weight:700;
+    }
+    .summary{
+      margin-top:32px;
+      border-left:4px solid var(--accent2);
+      padding:6px 0 6px 18px;
+      color:#d1fae5;
+      font-size:18px;
+    }
+    .note{
+      margin-top:34px;
+      color:var(--muted);
+      font-size:14px;
+      text-align:center;
+    }
+    code{
+      background:#0b1220;
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:1px 6px;
+      color:#bfdbfe;
+    }
+    @media (max-width:720px){
+      .grid{grid-template-columns:1fr}
+      h1{font-size:34px}
+      .wrap{padding:36px 18px 52px}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Sandbox / 沙盒</div>
+      <h1>程序员在谈 Sandbox 时，到底在谈什么？</h1>
+      <p class="lead">
+        先不谈 Harness，也先不钻 namespace、cgroups、seccomp 的实现细节。
+        只看一个最重要的问题：<strong>如何让一段“不完全可信”的程序可以运行，但又不能把整台机器搞坏。</strong>
+      </p>
+    </section>
+
+    <div class="quote">
+      可以把 Sandbox 先理解成：<b>给程序一个“受控的小世界”运行。</b><br/>
+      它可以做事，但能看到什么、能用多少资源、能做哪些动作、什么时候结束，都由外面控制。
+    </div>
+
+    <section class="grid">
+      <article class="card">
+        <div class="num">1</div>
+        <h2>隔离 Isolation</h2>
+        <p class="q">这个程序能“看到”什么？</p>
+        <p>
+          沙盒要把程序和宿主机隔开。程序通常不应该随便看到宿主机上的进程、文件、网络环境等。
+        </p>
+        <div class="examples">
+          <b>典型问题：</b><br/>
+          能不能看到 <code>/home</code>？<br/>
+          能不能看到其他用户的进程？<br/>
+          能不能访问宿主机真实网络？
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="num">2</div>
+        <h2>资源限制 Resource Limits</h2>
+        <p class="q">它最多能消耗多少东西？</p>
+        <p>
+          即使程序没有恶意，只是写了死循环、内存泄漏、无限创建线程，也不能让它拖垮整台服务器。
+        </p>
+        <div class="examples">
+          <b>常见限制：</b><br/>
+          CPU 时间、内存、进程数、线程数、磁盘空间、运行总时长。
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="num">3</div>
+        <h2>权限 Permission</h2>
+        <p class="q">它“允许做”什么？</p>
+        <p>
+          能看见某样东西，不代表一定允许操作它。沙盒通常还会进一步限制文件、网络、系统调用等权限。
+        </p>
+        <div class="examples">
+          <b>典型问题：</b><br/>
+          能不能写文件？<br/>
+          能不能访问公网？<br/>
+          能不能执行任意系统调用？<br/>
+          能不能启动新的程序？
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="num">4</div>
+        <h2>生命周期 Lifecycle</h2>
+        <p class="q">这个“小世界”什么时候出生、什么时候销毁？</p>
+        <p>
+          Sandbox 往往不是永久存在的。一个任务来了，创建环境；程序运行；任务结束后清理。
+        </p>
+        <div class="examples">
+          <b>典型流程：</b><br/>
+          创建 → 放入代码/数据 → 启动 → 监控 → 超时/结束 → 销毁。
+        </div>
+      </article>
+
+      <article class="card full">
+        <div class="num">5</div>
+        <h2>性能与成本 Performance / Cost</h2>
+        <p class="q">隔离得越狠越好吗？不一定。</p>
+        <p>
+          如果每运行一个小程序都启动一整台虚拟机，安全性可能很好，但启动慢、占内存、成本高。
+          所以实际工程里一直在权衡：<strong>隔离强度、启动速度、资源占用、兼容性</strong>。
+        </p>
+        <div class="examples">
+          <b>核心权衡：</b>
+          “这个场景到底需要多强的隔离，才能既安全，又不至于太重？”
+        </div>
+      </article>
+    </section>
+
+    <section class="scenario">
+      <h2>一个最直观的场景：在线运行 C++ 代码</h2>
+      <p>
+        假设我们做一个简化版 LeetCode：用户上传 <code>main.cpp</code>，服务器替他编译并运行。
+      </p>
+
+      <div class="flow">
+        <span class="step">上传代码</span>
+        <span class="arrow">→</span>
+        <span class="step">编译</span>
+        <span class="arrow">→</span>
+        <span class="step">沙盒中运行</span>
+        <span class="arrow">→</span>
+        <span class="step">返回输出</span>
+        <span class="arrow">→</span>
+        <span class="step">销毁环境</span>
+      </div>
+
+      <p>
+        如果用户写了 <span class="bad">while(true) {}</span>，
+        沙盒不需要理解“这是不是死循环”，只需要保证：
+        <strong>超过 2 秒还没结束，就终止这个任务。</strong>
+      </p>
+
+      <p>
+        如果程序疯狂申请内存，也不需要先分析代码，只需要规定：
+        <strong>最多给你 256 MB，超过就杀掉。</strong>
+      </p>
+
+      <p>
+        这就是 Sandbox 一个非常重要的思维：
+        <strong>不一定提前证明程序绝对安全，而是把它可能造成的后果控制在一个边界里。</strong>
+      </p>
+    </section>
+
+    <div class="summary">
+      <strong>一句话记忆：</strong><br/>
+      Sandbox 讨论的核心不是某一个 Linux 技术，而是：
+      <strong>隔离什么、限制什么、允许什么、活多久，以及这么做要付出多少成本。</strong>
+    </div>
+
+    <div class="note">
+      后面再学习 namespace、cgroups、seccomp、容器、虚拟机时，
+      可以把它们看成是在回答上面这些问题的不同“实现零件”。
+    </div>
+  </main>
+</body>
+</html>

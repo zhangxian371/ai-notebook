@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>现代 Agent Harness 的基本工作模型——以 DeepSeek Harness 为背景</title>
+<style>
+:root{--bg:#f6f7f9;--paper:#fff;--text:#20242a;--muted:#667085;--line:#e4e7ec;--soft:#f8fafc;--dark:#111827}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.78}
+.page{max-width:1000px;margin:44px auto;padding:0 24px 72px}
+.hero,.card{background:var(--paper);border:1px solid var(--line);border-radius:18px}
+.hero{padding:40px 44px;margin-bottom:24px}.card{padding:30px 34px;margin:20px 0}
+.eyebrow{font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+h1{margin:0 0 14px;font-size:34px;line-height:1.22}h2{margin:0 0 18px;font-size:25px}h3{margin:24px 0 8px;font-size:18px}
+p{margin:10px 0}.lead{font-size:18px;color:#475467;margin:0}
+.chapter{margin:34px 0 14px;padding:16px 20px;background:var(--dark);color:#fff;border-radius:14px;font-size:24px;font-weight:700}
+.chapter small{display:block;margin-top:4px;font-size:14px;font-weight:400;color:#d0d5dd}
+.quote{border-left:4px solid #98a2b3;background:var(--soft);padding:15px 18px;border-radius:10px;margin:16px 0;font-size:17px}
+.term{background:#f9fafb;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}.word,code{font-family:"Cascadia Code","Consolas",monospace}
+.flow{font-family:"Cascadia Code","Consolas",monospace;white-space:pre-wrap;background:#fafafa;border:1px dashed #d0d5dd;border-radius:12px;padding:21px;line-height:1.65;overflow-x:auto;margin:16px 0}
+pre{background:var(--dark);color:#f9fafb;border-radius:12px;padding:20px;overflow-x:auto;line-height:1.6;font-family:"Cascadia Code","Consolas",monospace;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}.mini{background:#fcfcfd;border:1px solid var(--line);border-radius:12px;padding:18px}.mini strong{display:block;font-size:17px;margin-bottom:4px}.role{color:var(--muted);font-size:14px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px}th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}th{background:#fafafa;font-weight:700}
+.key{background:var(--dark);color:#fff;border-radius:16px;padding:26px 30px;margin-top:22px}.key h2{color:#fff;margin-top:0}.key th,.key td{border-color:#344054}.key th{background:#1f2937}
+.note,.footer{color:var(--muted);font-size:14px}.footer{text-align:center;margin-top:28px;font-size:13px}
+@media(max-width:720px){.page{margin-top:18px;padding:0 14px 44px}.hero,.card{padding:24px 20px}h1{font-size:28px}.grid{grid-template-columns:1fr}.chapter{font-size:21px}}
+</style>
+</head>
+<body>
+<main class="page">
+
+<section class="hero">
+<div class="eyebrow">Agent / Harness 学习笔记</div>
+<h1>现代 Agent Harness 的基本工作模型</h1>
+<p class="lead">——先理解通用 Agent 怎么工作，再看 DeepSeek Harness 是怎么把它实现出来的。</p>
+</section>
+
+<section class="card">
+<h2>先把两层分开</h2>
+<p>学习 Harness 时最容易混淆的是两件事：</p>
+<div class="flow">第一层：通用 Agent / Harness 概念
+回答：
+“一个现代 Agent 一般是怎么工作的？”
+
+第二层：DeepSeek Harness 的具体实现
+回答：
+“DeepSeek 用什么软件架构把这些能力组织起来？”</div>
+<p><strong>LLM、Agent Loop、Tool、Sandbox、Session</strong> 可以作为理解现代 Agent 的通用概念。</p>
+<p><strong>Cordis、ctx、Service、inject</strong> 则属于 DeepSeek Harness / Cordis 的具体实现方式。</p>
+</section>
+
+<div class="chapter">第一章：先不管 DeepSeek，现代 Agent 是怎么干活的？
+<small>这一章建立通用心智模型，不讨论 DeepSeek 的具体源码设计。</small></div>
+
+<section class="card">
+<h2>1. Harness 是什么？</h2>
+<div class="term"><strong><span class="word">Harness</span></strong>
+<p>普通英语里有“挽具、束具、把力量组织起来使用”的意思。在 Agent 领域，可以先理解成：<strong>把 LLM、工具、上下文、执行环境等组织起来，让模型能够持续完成任务的运行系统。</strong></p></div>
+<p>单独一个 LLM，往往更像：</p>
+<div class="flow">用户
+ ↓
+LLM
+ ↓
+回答</div>
+<p>有了 Harness 后，变成：</p>
+<div class="flow">用户任务
+   ↓
+LLM 思考
+   ↓
+调用工具
+   ↓
+看到结果
+   ↓
+继续思考
+   ↓
+继续执行
+   ↓
+直到任务完成</div>
+<div class="quote">可以先把 Harness 理解成：让 LLM 从“会回答”变成“能持续干活”的那一整套外围系统。</div>
+</section>
+
+<section class="card">
+<h2>2. 五个核心角色</h2>
+<div class="grid">
+<div class="mini"><strong>LLM</strong><div class="role">大脑 / 技术专家</div><p>负责判断下一步应该做什么。</p></div>
+<div class="mini"><strong>Agent Loop</strong><div class="role">项目经理 / 流程控制器</div><p>负责不断推进“想 → 做 → 看结果 → 再想”。</p></div>
+<div class="mini"><strong>Tools</strong><div class="role">手脚 / 工具箱</div><p>负责读文件、改文件、执行 shell、搜索等真正的动作。</p></div>
+<div class="mini"><strong>Sandbox</strong><div class="role">工作间 / 权限边界</div><p>规定工具在哪里执行，以及允许碰哪些资源。</p></div>
+<div class="mini"><strong>Session</strong><div class="role">工作档案 / 过程记录</div><p>保存这一趟任务中前面发生过什么。</p></div>
+</div>
+</section>
+
+<section class="card">
+<h2>3. 一次真实任务怎么跑？</h2>
+<p>假设你说：</p>
+<div class="quote">帮我把这个 C++ 项目的编译错误修掉。</div>
+<h3>第一步：Agent Loop 去问 LLM</h3>
+<div class="flow">Agent Loop
+    ↓
+LLM</div>
+<p>LLM 判断：</p>
+<div class="quote">先执行 <code>make</code>，看看实际编译错误。</div>
+<p>这里 LLM 只是做出判断，它本身通常不会真的执行 <code>make</code>。</p>
+
+<h3>第二步：Agent Loop 调用 Tool</h3>
+<div class="flow">LLM：
+“执行 make”
+      ↓
+Agent Loop
+      ↓
+Tool</div>
+
+<h3>第三步：在 Sandbox 中执行</h3>
+<div class="flow">Tool
+ ↓
+Sandbox
+ ↓
+/workspace/project
+ ↓
+make</div>
+<pre>main.cpp:52: error: ...</pre>
+
+<h3>第四步：把结果交回去</h3>
+<div class="flow">Sandbox
+   ↓
+Tool
+   ↓
+Agent Loop
+   ↓
+Session 记录
+   ↓
+LLM 再分析</div>
+<p>LLM 看完报错后继续判断、修改、重新编译，直到任务完成。</p>
+</section>
+
+<section class="card">
+<h2>4. 最容易混淆：LLM 和 Agent Loop</h2>
+<div class="term"><strong><span class="word">Loop</span></strong>
+<p>英文就是“循环”。所以 <strong>Agent Loop</strong> 可以先理解成“Agent 的循环执行过程”。</p></div>
+<p><strong>LLM = 想。</strong></p>
+<p><strong>Agent Loop = 让“想、做、观察、再想”循环起来。</strong></p>
+<pre><code>while (!finished) {
+    Action action = llm.think(context);
+
+    if (action.isToolCall()) {
+        Result result = tools.execute(action);
+        context.add(result);
+    } else {
+        finished = true;
+    }
+}</code></pre>
+<p class="note">真实系统会复杂得多，但这段伪代码足以建立第一层直觉。</p>
+</section>
+
+<section class="card">
+<h2>5. Tool 和 Sandbox 的区别</h2>
+<div class="term"><strong><span class="word">Sandbox</span></strong>
+<p>字面是“沙箱”。现实里的沙箱是一个有边界的玩耍区域；软件里的 Sandbox 也强调：<strong>可以运行，但活动范围被限制在一个边界内。</strong></p></div>
+<table>
+<thead><tr><th>概念</th><th>回答的问题</th><th>现实类比</th></tr></thead>
+<tbody>
+<tr><td>Tool</td><td>能干什么？</td><td>锤子、电钻、扳手</td></tr>
+<tr><td>Sandbox</td><td>在哪里干？能干到什么程度？</td><td>工厂车间、受控工作区</td></tr>
+</tbody>
+</table>
+<p>因此，“Agent 有 bash 工具”不等于“它可以在你的电脑上随便执行任何命令”。</p>
+</section>
+
+<section class="card">
+<h2>6. Session 是什么？</h2>
+<div class="term"><strong><span class="word">Session</span></strong>
+<p>普通英语里有“会话、一次连续活动”的意思。在这里可以先理解成：<strong>这一趟任务的工作档案。</strong></p></div>
+<div class="flow">用户：修 bug
+
+LLM：先 make
+Tool：make
+Result：第 52 行报错
+
+LLM：修改第 52 行
+Tool：edit
+
+Tool：make
+Result：成功</div>
+<p>这些过程需要被记录下来，否则下一轮 LLM 就不知道前面发生过什么。</p>
+</section>
+
+<section class="key">
+<h2>第一章只记这五问</h2>
+<table>
+<thead><tr><th>问题</th><th>对应组件</th></tr></thead>
+<tbody>
+<tr><td>谁负责想？</td><td><strong>LLM</strong></td></tr>
+<tr><td>谁负责让流程不断推进？</td><td><strong>Agent Loop</strong></td></tr>
+<tr><td>谁负责真正动手？</td><td><strong>Tools</strong></td></tr>
+<tr><td>在哪里动手、权限边界是什么？</td><td><strong>Sandbox</strong></td></tr>
+<tr><td>前面发生过什么？</td><td><strong>Session</strong></td></tr>
+</tbody>
+</table>
+<p style="font-size:18px;margin-top:18px">现代 Agent Harness 可以先感性地理解成：<strong>一个不断重复“想一下 → 动一下 → 记录一下”的机器。</strong></p>
+</section>
+
+<div class="chapter">第二章：DeepSeek Harness 是怎么实现这套东西的？
+<small>这一章开始进入 DeepSeek 自己的架构选择。</small></div>
+
+<section class="card">
+<h2>7. 通用问题 vs DeepSeek 的具体答案</h2>
+<table>
+<thead><tr><th>通用问题</th><th>DeepSeek Harness 的实现思路</th></tr></thead>
+<tbody>
+<tr><td>怎么组织各种模块？</td><td>Cordis</td></tr>
+<tr><td>模块怎么获得别的能力？</td><td>Context / ctx + Service</td></tr>
+<tr><td>模块怎么声明自己依赖什么？</td><td>inject</td></tr>
+<tr><td>LLM 怎么接入？</td><td>插件化</td></tr>
+<tr><td>Tool 怎么接入？</td><td>插件化</td></tr>
+<tr><td>Agent Loop 能不能替换？</td><td>可以，也做成插件</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<h2>8. Cordis 是什么？</h2>
+<div class="term"><strong><span class="word">Cordis</span></strong>
+<p>这是一个专有名称，不是软件工程里“框架”的通用单词。在 DeepSeek Harness 中，可以先把它理解成：<strong>负责组织插件、服务和生命周期的底层插件框架。</strong></p></div>
+<p>如果把 DeepSeek Harness 看成一座办公楼，Cordis 更像：</p>
+<div class="quote">门禁、电梯、房间编号、供电接口和物业系统。</div>
+<p>它本身不负责“修 C++ bug”，但负责让真正做事的模块能够被加载、找到彼此、声明依赖并正常协作。</p>
+</section>
+
+<section class="card">
+<h2>9. Context / ctx、Service、Plugin</h2>
+<div class="term"><strong><span class="word">Context</span> / <span class="word">ctx</span></strong>
+<p>Context 是“上下文、运行环境”；<code>ctx</code> 是常见缩写。在 Cordis 里，可以粗略理解成：<strong>一个集中拿各种服务的运行时上下文。</strong></p></div>
+<div class="term"><strong><span class="word">Service</span></strong>
+<p>普通英语是“服务”。软件里常表示：<strong>一个模块对其他模块提供的稳定能力/API。</strong></p></div>
+<div class="term"><strong><span class="word">Plugin</span></strong>
+<p>来自 plug in，字面就是“插进去”。这里更适合理解成：<strong>可插拔模块。</strong></p></div>
+
+<div class="flow">某个 LLM Plugin
+      │
+      │ 提供
+      ▼
+  llm Service
+      │
+      ▼
+    ctx.llm
+      ▲
+      │ 使用
+      │
+Agent Loop Plugin</div>
+
+<p>于是 Agent Loop 不需要知道下面究竟是 DeepSeek、Claude 还是其他模型，只需要知道：<strong>“这里有一个 llm 服务可以用。”</strong></p>
+</section>
+
+<section class="card">
+<h2>10. “一切皆插件”到底是什么意思？</h2>
+<p>它并不是说整个系统真的所有东西都是插件。</p>
+<div class="quote">更准确的理解：凡是可能变化、可能替换、可能存在多个实现的能力，都尽量做成可插拔模块。</div>
+
+<p>例如今天：</p>
+<div class="flow">LLM        = DeepSeek
+Sandbox    = 本地环境
+Session    = 某种本地存储
+Agent Loop = 一步一想、一做</div>
+
+<p>以后可以换成：</p>
+<div class="flow">LLM        = 另一个模型
+Sandbox    = Docker / 远程环境
+Session    = 另一种存储
+Agent Loop = Planner + Executor</div>
+
+<p>如果接口保持一致，Harness 的核心组织机制不需要跟着大改。</p>
+</section>
+
+<section class="card">
+<h2>11. 最后把两层重新叠起来</h2>
+<div class="flow">══════════ 通用 Agent / Harness 心智模型 ══════════
+
+                 Agent Loop
+                     │
+            ┌────────┼────────┐
+            ▼        ▼        ▼
+           LLM      Tools   Session
+                     │
+                  Sandbox
+
+           想 → 做 → 看结果 → 再想
+
+
+════════ DeepSeek Harness 的具体架构 ═════════════
+
+                   Cordis
+                     │
+              Context / ctx
+                     │
+            Service / Plugin
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+     LLM能力       Tool能力     Loop能力
+        │            │            │
+      可替换        可替换        可替换</div>
+
+<p>所以不要把 Cordis、ctx、inject 当成所有 Agent 都必须使用的通用术语。它们只是 DeepSeek Harness 给通用 Agent 问题提供的一套具体软件架构答案。</p>
+</section>
+
+<section class="key">
+<h2>整篇最终结论</h2>
+<p><strong>第一层：</strong>先学会看懂 Agent 的工作过程——LLM 想、Agent Loop 推进、Tool 动手、Sandbox 限制执行环境、Session 保存过程。</p>
+<p><strong>第二层：</strong>再看 DeepSeek Harness 如何用 Cordis、Plugin、Service、ctx 等机制，把这些能力做成一套可组合、可替换的软件系统。</p>
+<p style="font-size:18px;margin-top:18px"><strong>通用原理先于具体实现。</strong>这样以后再看 Codex、Claude Code、OpenClaw、Hermes，也能使用同一套心智模型，而不会把某一个项目的实现方式误认为 Agent 的唯一标准。</p>
+</section>
+
+<div class="footer">《现代 Agent Harness 的基本工作模型——以 DeepSeek Harness 为背景》</div>
+</main>
+</body>
+</html>
